@@ -15,12 +15,16 @@ export async function POST(req: NextRequest) {
 
   const updates = partidos.map((p: {
     id: number
+    hora?: string | null; lugar?: string | null; cancha?: string | null
     set1_p1: number; set1_p2: number
     set2_p1: number; set2_p2: number
     tb_p1?: number | null; tb_p2?: number | null
     jugado: boolean
   }) =>
     supabaseAdmin.from('partidos').update({
+      hora: p.hora ?? null,
+      lugar: p.lugar ?? null,
+      cancha: p.cancha ?? null,
       set1_p1: p.set1_p1,
       set1_p2: p.set1_p2,
       set2_p1: p.set2_p1,

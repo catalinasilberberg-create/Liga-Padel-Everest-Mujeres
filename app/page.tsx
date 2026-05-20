@@ -2,18 +2,16 @@ import { getParejas, getPartidos, getProximaFecha, getUltimaFecha } from '@/lib/
 import { calcularPosiciones } from '@/lib/calculos'
 import TablaGrupo from '@/components/TablaGrupo'
 import PartidoCard from '@/components/PartidoCard'
-import { Grupo, getLabelGrupo, getDivision } from '@/lib/types'
+import { Grupo, getLabelGrupo, getColorGrupo } from '@/lib/types'
 
 const GRUPOS: { key: Grupo; label: string; fechaMin?: number }[] = [
-  { key: 'principiante', label: 'Principiante' },
-  { key: 'd_copa_oro', label: 'D — Copa Oro', fechaMin: 6 },
+  { key: 'principiante',   label: 'Principiante' },
+  { key: 'd_copa_oro',     label: 'D — Copa Oro',     fechaMin: 6 },
   { key: 'd_copa_plata_1', label: 'D — Copa Plata 1', fechaMin: 6 },
   { key: 'd_copa_plata_2', label: 'D — Copa Plata 2', fechaMin: 6 },
-  { key: 'c_menos', label: 'C−' },
-  { key: 'c_mas', label: 'C+' },
+  { key: 'c_menos',        label: 'C−' },
+  { key: 'c_mas',          label: 'C+' },
 ]
-
-const DIVISIONES_FIXTURE = ['Principiante', 'Categoría D', 'C−', 'C+']
 
 export const revalidate = 60
 
@@ -42,30 +40,38 @@ export default async function HomePage() {
     })
 
   return (
-    <div className="space-y-8">
-      <div className="text-center">
+    <div className="space-y-8 pb-4">
+      {/* Hero */}
+      <div className="text-center py-2">
         <h1 className="text-2xl font-bold text-[#6d28d9]">Liga de Pádel Everest</h1>
-        <p className="text-gray-500 text-sm mt-1">Mujeres — Primer Semestre 2026</p>
+        <p className="text-gray-400 text-sm mt-1">Mujeres · Primer Semestre 2026</p>
       </div>
 
       {/* Próxima fecha */}
       {proximaFecha && (
         <section>
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-lg">📅</span>
             <h2 className="font-bold text-gray-700">{proximaFecha.label}</h2>
             <span className="text-sm text-gray-400 capitalize">{formatFecha(proximaFecha.fecha)}</span>
+            <span className="ml-auto text-xs bg-purple-100 text-[#6d28d9] font-semibold px-2 py-0.5 rounded-full">Próxima</span>
           </div>
-          {DIVISIONES_FIXTURE.map((div) => {
-            const partidos = partidosProxima.filter(
-              (p) => p.pareja1 && getDivision(p.pareja1.grupo) === div
-            )
-            if (partidos.length === 0) return null
+
+          {GRUPOS.map((g) => {
+            const gPartidos = partidosProxima.filter((p) => p.pareja1?.grupo === g.key)
+            if (gPartidos.length === 0) return null
+            const color = getColorGrupo(g.key)
             return (
-              <div key={div} className="mb-4">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">{div}</p>
+              <div key={g.key} className="mb-4">
+                <div
+                  style={{ borderLeftColor: color.header, backgroundColor: color.bg }}
+                  className="border-l-4 px-3 py-1 rounded-r-lg mb-2"
+                >
+                  <span style={{ color: color.header }} className="text-xs font-bold uppercase tracking-wider">
+                    {g.label}
+                  </span>
+                </div>
                 <div className="grid gap-2 sm:grid-cols-2">
-                  {partidos.map((p) => <PartidoCard key={p.id} partido={p} />)}
+                  {gPartidos.map((p) => <PartidoCard key={p.id} partido={p} grupo={g.key} />)}
                 </div>
               </div>
             )
@@ -73,10 +79,9 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* Posiciones actuales */}
+      {/* Posiciones */}
       <section>
         <div className="flex items-center gap-2 mb-3">
-          <span className="text-lg">🏆</span>
           <h2 className="font-bold text-gray-700">
             Posiciones{ultimaFecha ? ` — ${ultimaFecha.label}` : ''}
           </h2>
@@ -88,6 +93,7 @@ export default async function HomePage() {
               titulo={getLabelGrupo(g.key)}
               posiciones={g.posiciones}
               nota={g.fechaMin ? `Puntaje desde Fecha ${g.fechaMin}` : undefined}
+              grupo={g.key}
             />
           ))}
         </div>

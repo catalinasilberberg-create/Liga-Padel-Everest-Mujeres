@@ -8,6 +8,9 @@ interface PartidoForm {
   id: number
   pareja1: string
   pareja2: string
+  hora: string
+  lugar: string
+  cancha: string
   set1_p1: string; set1_p2: string
   set2_p1: string; set2_p2: string
   tb_p1: string; tb_p2: string
@@ -46,6 +49,9 @@ export default function AdminPage() {
           id: p.id,
           pareja1: `${p.pareja1.jugador1} - ${p.pareja1.jugador2}`,
           pareja2: `${p.pareja2.jugador1} - ${p.pareja2.jugador2}`,
+          hora: p.hora ?? '',
+          lugar: p.lugar ?? '',
+          cancha: p.cancha ?? '',
           set1_p1: p.set1_p1?.toString() ?? '',
           set1_p2: p.set1_p2?.toString() ?? '',
           set2_p1: p.set2_p1?.toString() ?? '',
@@ -79,6 +85,9 @@ export default function AdminPage() {
     setExito(false)
     const partidos = formularios.map((f) => ({
       id: f.id,
+      hora: f.hora.trim() || null,
+      lugar: f.lugar.trim() || null,
+      cancha: f.cancha.trim() || null,
       set1_p1: parseInt(f.set1_p1) || 0,
       set1_p2: parseInt(f.set1_p2) || 0,
       set2_p1: parseInt(f.set2_p1) || 0,
@@ -154,6 +163,40 @@ export default function AdminPage() {
               />
               No jugado
             </label>
+          </div>
+
+          {/* Hora / Lugar / Cancha */}
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <label className="block text-xs text-gray-400 mb-0.5">Hora</label>
+              <input
+                type="text"
+                value={f.hora}
+                onChange={(e) => actualizar(idx, 'hora', e.target.value)}
+                placeholder="ej. 09:00"
+                className="w-full border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#6d28d9]"
+              />
+            </div>
+            <div className="flex-1">
+              <label className="block text-xs text-gray-400 mb-0.5">Lugar</label>
+              <input
+                type="text"
+                value={f.lugar}
+                onChange={(e) => actualizar(idx, 'lugar', e.target.value)}
+                placeholder="ej. Everest"
+                className="w-full border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#6d28d9]"
+              />
+            </div>
+            <div className="w-20">
+              <label className="block text-xs text-gray-400 mb-0.5">Cancha</label>
+              <input
+                type="text"
+                value={f.cancha}
+                onChange={(e) => actualizar(idx, 'cancha', e.target.value)}
+                placeholder="ej. 3"
+                className="w-full border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#6d28d9]"
+              />
+            </div>
           </div>
 
           {!f.no_jugado && (

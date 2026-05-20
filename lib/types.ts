@@ -70,3 +70,15 @@ export function getDivision(grupo: Grupo): string {
   if (grupo === 'c_mas') return 'C+'
   return grupo
 }
+
+export function getColorGrupo(grupo: Grupo): { header: string; bg: string } {
+  const map: Record<Grupo, { header: string; bg: string }> = {
+    principiante:   { header: '#6d28d9', bg: '#f5f3ff' },
+    d_copa_oro:     { header: '#b45309', bg: '#fffbeb' },
+    d_copa_plata_1: { header: '#4338ca', bg: '#eef2ff' },
+    d_copa_plata_2: { header: '#0f766e', bg: '#f0fdfa' },
+    c_menos:        { header: '#156082', bg: '#ecfeff' },
+    c_mas:          { header: '#166534', bg: '#f0fdf4' },
+  }
+  return map[grupo] ?? { header: '#374151', bg: '#f9fafb' }
+}
