@@ -9,10 +9,13 @@ export default async function FixturePage() {
     getPartidos(),
   ])
 
-  // Solo mostrar fechas que tienen partidos cargados, de más reciente a más antigua
-  const fechaConPartidos = new Set(partidos.map((p) => p.fecha_id))
+  // Solo mostrar fechas con fixture real cargado (>= 5 partidos), de más reciente a más antigua
+  const conteoPorFecha = partidos.reduce<Record<number, number>>((acc, p) => {
+    acc[p.fecha_id] = (acc[p.fecha_id] ?? 0) + 1
+    return acc
+  }, {})
   const fechasMostrar = [...fechas]
-    .filter((f) => fechaConPartidos.has(f.id))
+    .filter((f) => (conteoPorFecha[f.id] ?? 0) >= 5)
     .reverse()
 
   return (
