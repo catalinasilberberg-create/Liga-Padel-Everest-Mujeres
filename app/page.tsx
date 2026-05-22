@@ -13,7 +13,7 @@ const GRUPOS: { key: Grupo; label: string; fechaMin?: number }[] = [
   { key: 'c_mas',          label: 'C+' },
 ]
 
-export const revalidate = 60
+export const revalidate = 0
 
 export default async function HomePage() {
   const [proximaFecha, ultimaFecha] = await Promise.all([

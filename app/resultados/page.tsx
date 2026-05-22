@@ -11,7 +11,7 @@ const GRUPOS: { key: Grupo; label: string }[] = [
   { key: 'c_mas',          label: 'C+' },
 ]
 
-export const revalidate = 60
+export const revalidate = 0
 
 export default async function ResultadosPage() {
   const [fechas, todosPartidos] = await Promise.all([
