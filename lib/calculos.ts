@@ -2,6 +2,8 @@ import { Partido, PosicionGrupo, Pareja } from './types'
 
 export function calcularPuntos(p: Partido): { p1: number; p2: number } {
   if (!p.jugado || p.set1_p1 === null || p.set1_p2 === null) return { p1: 0, p2: 0 }
+  const totalGames = (p.set1_p1 ?? 0) + (p.set1_p2 ?? 0) + (p.set2_p1 ?? 0) + (p.set2_p2 ?? 0)
+  if (totalGames === 0) return { p1: 0, p2: 0 }
 
   const setsP1 = (p.set1_p1 > p.set1_p2 ? 1 : 0) + (p.set2_p1! > p.set2_p2! ? 1 : 0)
   const setsP2 = 2 - setsP1
@@ -44,6 +46,8 @@ export function calcularPosiciones(
   for (const partido of partidos) {
     if (!partido.jugado) continue
     if (fechaMin !== undefined && (partido.fecha?.numero ?? 0) < fechaMin) continue
+    const totalGames = (partido.set1_p1 ?? 0) + (partido.set1_p2 ?? 0) + (partido.set2_p1 ?? 0) + (partido.set2_p2 ?? 0)
+    if (totalGames === 0) continue
 
     const { p1, p2 } = calcularPuntos(partido)
     const dif = calcularDifGames(partido)
