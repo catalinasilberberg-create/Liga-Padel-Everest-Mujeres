@@ -16,12 +16,16 @@ const GRUPOS: { key: Grupo; label: string }[] = [
 interface Props {
   fechas: Fecha[]
   partidos: Partido[]
-  proximaId: number | null
 }
 
-export default function FixtureTabs({ fechas, partidos, proximaId }: Props) {
+const formatTabDate = (fechaStr: string) => {
+  const [, mes, dia] = fechaStr.split('-')
+  return `${dia}.${mes}`
+}
+
+export default function FixtureTabs({ fechas, partidos }: Props) {
   const [fechaSeleccionada, setFechaSeleccionada] = useState<number>(
-    proximaId ?? fechas[0]?.id ?? 0
+    fechas[0]?.id ?? 0
   )
 
   const fecha = fechas.find((f) => f.id === fechaSeleccionada)
@@ -33,7 +37,6 @@ export default function FixtureTabs({ fechas, partidos, proximaId }: Props) {
       <div className="flex gap-1.5 overflow-x-auto pb-2 mb-4 scrollbar-hide">
         {fechas.map((f) => {
           const activa = f.id === fechaSeleccionada
-          const esProxima = f.id === proximaId
           return (
             <button
               key={f.id}
@@ -41,12 +44,10 @@ export default function FixtureTabs({ fechas, partidos, proximaId }: Props) {
               className={`flex-shrink-0 text-xs font-semibold px-3 py-1.5 rounded-full transition-colors ${
                 activa
                   ? 'bg-[#6d28d9] text-white'
-                  : esProxima
-                  ? 'bg-purple-100 text-[#6d28d9]'
                   : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
               }`}
             >
-              {f.label}
+              {f.label} ({formatTabDate(f.fecha)})
             </button>
           )
         })}

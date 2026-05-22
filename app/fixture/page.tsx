@@ -9,17 +9,16 @@ export default async function FixturePage() {
     getPartidos(),
   ])
 
-  const hoy = new Date().toISOString().split('T')[0]
-  const fechasProximas = fechas.filter((f) => f.fecha >= hoy)
-  const proximaId = fechasProximas[0]?.id ?? null
-
-  // Mostrar solo fechas futuras; si no hay, mostrar todas
-  const fechasMostrar = fechasProximas.length > 0 ? fechasProximas : fechas
+  // Solo mostrar fechas que tienen partidos cargados, de más reciente a más antigua
+  const fechaConPartidos = new Set(partidos.map((p) => p.fecha_id))
+  const fechasMostrar = [...fechas]
+    .filter((f) => fechaConPartidos.has(f.id))
+    .reverse()
 
   return (
     <div className="pb-4">
       <h1 className="text-xl font-bold text-[#6d28d9] mb-4">Fixture</h1>
-      <FixtureTabs fechas={fechasMostrar} partidos={partidos} proximaId={proximaId} />
+      <FixtureTabs fechas={fechasMostrar} partidos={partidos} />
     </div>
   )
 }
