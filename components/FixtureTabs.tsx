@@ -130,10 +130,14 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
               <div className="flex items-stretch">
                 <div className="flex-1 px-3 py-1 divide-y divide-gray-50">
                   {[
-                    { a: slot(stPrincipiante, 1), b: slot(stPrincipiante, 4) },
-                    { a: slot(stPrincipiante, 2), b: slot(stPrincipiante, 3) },
+                    { a: slot(stPrincipiante, 1), b: slot(stPrincipiante, 4), hora: '18:30', lugar: 'Everest', cancha: '1' },
+                    { a: slot(stPrincipiante, 2), b: slot(stPrincipiante, 3), hora: '19:30', lugar: 'Everest', cancha: '1' },
                   ].map((c, i) => (
                     <div key={i} className="flex items-center gap-2 py-1.5">
+                      <div className="shrink-0 text-center w-16">
+                        <div className="text-xs font-bold text-[#6d28d9]">{c.hora}</div>
+                        <div className="text-[10px] text-gray-400">{c.lugar} C{c.cancha}</div>
+                      </div>
                       <span className="flex-1 text-xs font-medium text-gray-800 truncate">{c.a}</span>
                       <span className="text-xs text-gray-300 shrink-0">vs</span>
                       <span className="flex-1 text-xs font-medium text-gray-800 truncate text-right">{c.b}</span>
@@ -148,10 +152,14 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
               <div className="flex items-stretch">
                 <div className="flex-1 px-3 py-1 divide-y divide-gray-50">
                   {[
-                    { a: slot(stPrincipiante, 5), b: slot(stPrincipiante, 8) },
-                    { a: slot(stPrincipiante, 6), b: slot(stPrincipiante, 7) },
+                    { a: slot(stPrincipiante, 5), b: slot(stPrincipiante, 8), hora: '18:30', lugar: 'Everest', cancha: '2' },
+                    { a: slot(stPrincipiante, 6), b: slot(stPrincipiante, 7), hora: '19:30', lugar: 'Everest', cancha: '2' },
                   ].map((c, i) => (
                     <div key={i} className="flex items-center gap-2 py-1.5">
+                      <div className="shrink-0 text-center w-16">
+                        <div className="text-xs font-bold text-[#6d28d9]">{c.hora}</div>
+                        <div className="text-[10px] text-gray-400">{c.lugar} C{c.cancha}</div>
+                      </div>
                       <span className="flex-1 text-xs font-medium text-gray-800 truncate">{c.a}</span>
                       <span className="text-xs text-gray-300 shrink-0">vs</span>
                       <span className="flex-1 text-xs font-medium text-gray-800 truncate text-right">{c.b}</span>
@@ -175,12 +183,16 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
               <div className="flex items-stretch">
                 <div className="flex-1 px-3 py-1 divide-y divide-gray-50">
                   {[
-                    { a: slot(stCMenos, 1), b: slot(stCMenos, 8) },
-                    { a: slot(stCMenos, 2), b: slot(stCMenos, 7) },
-                    { a: slot(stCMenos, 3), b: slot(stCMenos, 6) },
-                    { a: slot(stCMenos, 4), b: slot(stCMenos, 5) },
+                    { a: slot(stCMenos, 1), b: slot(stCMenos, 8), hora: '18:00', lugar: 'PLT', cancha: '5' },
+                    { a: slot(stCMenos, 2), b: slot(stCMenos, 7), hora: '18:00', lugar: 'PLT', cancha: '6' },
+                    { a: slot(stCMenos, 3), b: slot(stCMenos, 6), hora: '19:00', lugar: 'PLT', cancha: '5' },
+                    { a: slot(stCMenos, 4), b: slot(stCMenos, 5), hora: '19:00', lugar: 'PLT', cancha: '6' },
                   ].map((c, i) => (
                     <div key={i} className="flex items-center gap-2 py-1.5">
+                      <div className="shrink-0 text-center w-16">
+                        <div className="text-xs font-bold text-[#156082]">{c.hora}</div>
+                        <div className="text-[10px] text-gray-400">{c.lugar} C{c.cancha}</div>
+                      </div>
                       <span className="flex-1 text-xs font-medium text-gray-800 truncate">{c.a}</span>
                       <span className="text-xs text-gray-300 shrink-0">vs</span>
                       <span className="flex-1 text-xs font-medium text-gray-800 truncate text-right">{c.b}</span>
@@ -195,6 +207,10 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
               <div className="flex items-stretch">
                 <div className="flex-1 px-3 py-1">
                   <div className="flex items-center gap-2 py-1.5">
+                    <div className="shrink-0 text-center w-16">
+                      <div className="text-xs font-bold text-[#156082]">20:00</div>
+                      <div className="text-[10px] text-gray-400">PLT C6</div>
+                    </div>
                     <span className="flex-1 text-xs font-medium text-gray-800 truncate">{slot(stCMenos, 9)}</span>
                     <span className="text-xs text-gray-300 shrink-0">vs</span>
                     <span className="flex-1 text-xs font-medium text-gray-800 truncate text-right">{slot(stCMenos, 10)}</span>
