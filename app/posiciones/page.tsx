@@ -3,12 +3,26 @@ import { calcularPosiciones } from '@/lib/calculos'
 import TablaGrupo from '@/components/TablaGrupo'
 import { Grupo, getLabelGrupo } from '@/lib/types'
 
-const GRUPOS: { key: Grupo; fechaMin?: number }[] = [
-  { key: 'principiante' },
+interface Zona { hasta: number; etiqueta: string; clasifica: boolean }
+
+const GRUPOS: { key: Grupo; fechaMin?: number; zonas?: Zona[] }[] = [
+  {
+    key: 'principiante',
+    zonas: [
+      { hasta: 4, etiqueta: 'Semifinales (10 jun)',   clasifica: true  },
+      { hasta: 8, etiqueta: 'Demás Lugares (10 jun)', clasifica: false },
+    ],
+  },
   { key: 'd_copa_oro',     fechaMin: 6 },
   { key: 'd_copa_plata_1', fechaMin: 6 },
   { key: 'd_copa_plata_2', fechaMin: 6 },
-  { key: 'c_menos' },
+  {
+    key: 'c_menos',
+    zonas: [
+      { hasta: 8,  etiqueta: 'Cuartos de Final (10 jun)', clasifica: true  },
+      { hasta: 10, etiqueta: '9° / 10° Lugar (10 jun)',   clasifica: false },
+    ],
+  },
   { key: 'c_mas' },
 ]
 
@@ -54,6 +68,7 @@ export default async function PosicionesPage() {
             posiciones={g.posiciones}
             nota={g.fechaMin ? `Puntaje desde Fecha ${g.fechaMin}` : undefined}
             grupo={g.key}
+            zonas={g.zonas}
           />
         ))}
       </div>
