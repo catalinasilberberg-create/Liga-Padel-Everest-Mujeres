@@ -173,6 +173,30 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
             </div>
           </div>
 
+          {/* Categoría D: Plata 1, Plata 2, Oro */}
+          {GRUPOS.filter((g) => g.key.startsWith('d_')).map((g) => {
+            const gPartidos = partidosFecha.filter((p) => p.pareja1?.grupo === g.key)
+            if (gPartidos.length === 0) return null
+            const color = getColorGrupo(g.key)
+            return (
+              <div key={g.key}>
+                <div
+                  style={{ borderLeftColor: color.header, backgroundColor: color.bg }}
+                  className="border-l-4 px-3 py-1 rounded-r-lg mb-1.5"
+                >
+                  <span style={{ color: color.header }} className="text-xs font-bold uppercase tracking-wider">
+                    {g.label}
+                  </span>
+                </div>
+                <div className="grid gap-1.5 sm:grid-cols-2">
+                  {gPartidos.map((p) => (
+                    <PartidoCard key={p.id} partido={p} grupo={g.key} />
+                  ))}
+                </div>
+              </div>
+            )
+          })}
+
           {/* ── C−: Cuartos de Final ── */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="px-4 py-2.5 bg-[#156082] text-white">
@@ -223,29 +247,27 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
             </div>
           </div>
 
-          {/* Grupos restantes con partidos normales (si los hubiere) */}
-          {GRUPOS.filter((g) => g.key !== 'principiante' && g.key !== 'c_menos').map((g) => {
-            const gPartidos = partidosFecha.filter((p) => p.pareja1?.grupo === g.key)
+          {/* C+ */}
+          {(() => {
+            const gPartidos = partidosFecha.filter((p) => p.pareja1?.grupo === 'c_mas')
             if (gPartidos.length === 0) return null
-            const color = getColorGrupo(g.key)
+            const color = getColorGrupo('c_mas')
             return (
-              <div key={g.key} className="mb-4">
+              <div>
                 <div
                   style={{ borderLeftColor: color.header, backgroundColor: color.bg }}
                   className="border-l-4 px-3 py-1 rounded-r-lg mb-1.5"
                 >
-                  <span style={{ color: color.header }} className="text-xs font-bold uppercase tracking-wider">
-                    {g.label}
-                  </span>
+                  <span style={{ color: color.header }} className="text-xs font-bold uppercase tracking-wider">C+</span>
                 </div>
                 <div className="grid gap-1.5 sm:grid-cols-2">
                   {gPartidos.map((p) => (
-                    <PartidoCard key={p.id} partido={p} grupo={g.key} />
+                    <PartidoCard key={p.id} partido={p} grupo="c_mas" />
                   ))}
                 </div>
               </div>
             )
-          })}
+          })()}
         </div>
       ) : (
         /* ── Partidos normales ──────────────────────────────────────────── */
