@@ -202,46 +202,46 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
             <div className="px-4 py-2.5 bg-[#156082] text-white">
               <h3 className="font-bold text-sm uppercase tracking-wider">C− — Cuartos de Final</h3>
             </div>
-            <div className="flex">
-              {/* Partidos */}
-              <div className="flex-1 min-w-0 divide-y divide-gray-100">
-                <div className="px-3 py-1 divide-y divide-gray-50">
-                  {[
-                    { a: slot(stCMenos, 1), b: slot(stCMenos, 8), hora: '18:00', lugar: 'PLT', cancha: '5' },
-                    { a: slot(stCMenos, 2), b: slot(stCMenos, 7), hora: '18:00', lugar: 'PLT', cancha: '6' },
-                    { a: slot(stCMenos, 3), b: slot(stCMenos, 6), hora: '19:00', lugar: 'PLT', cancha: '5' },
-                    { a: slot(stCMenos, 4), b: slot(stCMenos, 5), hora: '19:00', lugar: 'PLT', cancha: '6' },
-                  ].map((c, i) => (
-                    <div key={i} className="flex items-center gap-2 py-1.5">
-                      <div className="shrink-0 text-center w-16">
-                        <div className="text-xs font-bold text-[#156082]">{c.hora}</div>
-                        <div className="text-[10px] text-gray-400">{c.lugar} C{c.cancha}</div>
-                      </div>
-                      <span className="flex-1 min-w-0 text-xs font-medium text-gray-800 truncate">{c.a}</span>
-                      <span className="text-xs text-gray-300 shrink-0">vs</span>
-                      <span className="flex-1 min-w-0 text-xs font-medium text-gray-800 truncate text-right">{c.b}</span>
-                    </div>
-                  ))}
-                </div>
-                <div className="px-3 py-1">
-                  <div className="flex items-center gap-2 py-1.5">
-                    <div className="shrink-0 text-center w-16">
-                      <div className="text-xs font-bold text-[#156082]">20:00</div>
-                      <div className="text-[10px] text-gray-400">PLT C6</div>
-                    </div>
-                    <span className="flex-1 min-w-0 text-xs font-medium text-gray-800 truncate">{slot(stCMenos, 9)}</span>
-                    <span className="text-xs text-gray-300 shrink-0">vs</span>
-                    <span className="flex-1 min-w-0 text-xs font-medium text-gray-800 truncate text-right">{slot(stCMenos, 10)}</span>
-                  </div>
-                </div>
+
+            {/* QF rows */}
+            <div className="border-b border-gray-100">
+              <div className="px-3 py-1 bg-green-600">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-white">Cuartos de Final</span>
               </div>
-              {/* Etiquetas: flex-col flex-1 → siempre 50/50 */}
-              <div className="flex flex-col shrink-0 w-[4.5rem]">
-                <div className="flex-1 bg-green-600 flex items-center justify-center px-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-white text-center leading-tight">CUARTOS<br/>DE FINAL</span>
-                </div>
-                <div className="flex-1 bg-gray-400 flex items-center justify-center px-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-white text-center leading-tight">9° / 10°<br/>LUGAR</span>
+              <div className="px-3 py-1 divide-y divide-gray-50">
+                {[
+                  { a: slot(stCMenos, 1), b: slot(stCMenos, 8), hora: '18:00', lugar: 'PLT', cancha: '5' },
+                  { a: slot(stCMenos, 2), b: slot(stCMenos, 7), hora: '18:00', lugar: 'PLT', cancha: '6' },
+                  { a: slot(stCMenos, 3), b: slot(stCMenos, 6), hora: '19:00', lugar: 'PLT', cancha: '5' },
+                  { a: slot(stCMenos, 4), b: slot(stCMenos, 5), hora: '19:00', lugar: 'PLT', cancha: '6' },
+                ].map((c, i) => (
+                  <div key={i} className="flex items-center gap-2 py-1.5">
+                    <div className="shrink-0 text-center w-16">
+                      <div className="text-xs font-bold text-[#156082]">{c.hora}</div>
+                      <div className="text-[10px] text-gray-400">{c.lugar} C{c.cancha}</div>
+                    </div>
+                    <span className="flex-1 min-w-0 text-xs font-medium text-gray-800 truncate">{c.a}</span>
+                    <span className="text-xs text-gray-300 shrink-0">vs</span>
+                    <span className="flex-1 min-w-0 text-xs font-medium text-gray-800 truncate text-right">{c.b}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 9°/10° row */}
+            <div>
+              <div className="px-3 py-1 bg-gray-400">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-white">9° / 10° Lugar</span>
+              </div>
+              <div className="px-3 py-1">
+                <div className="flex items-center gap-2 py-1.5">
+                  <div className="shrink-0 text-center w-16">
+                    <div className="text-xs font-bold text-[#156082]">20:00</div>
+                    <div className="text-[10px] text-gray-400">PLT C6</div>
+                  </div>
+                  <span className="flex-1 min-w-0 text-xs font-medium text-gray-800 truncate">{slot(stCMenos, 9)}</span>
+                  <span className="text-xs text-gray-300 shrink-0">vs</span>
+                  <span className="flex-1 min-w-0 text-xs font-medium text-gray-800 truncate text-right">{slot(stCMenos, 10)}</span>
                 </div>
               </div>
             </div>
