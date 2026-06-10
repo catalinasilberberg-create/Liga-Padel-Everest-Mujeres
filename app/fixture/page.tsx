@@ -4,7 +4,7 @@ import FixtureTabs from '@/components/FixtureTabs'
 export const revalidate = 0
 
 // Fecha donde Principiante juega Semifinales y C− juega Cuartos de Final
-const BRACKET_FECHA_ID = 10
+const BRACKET_FECHA_ID = 25
 
 export default async function FixturePage() {
   const [fechas, partidos, proxima] = await Promise.all([
