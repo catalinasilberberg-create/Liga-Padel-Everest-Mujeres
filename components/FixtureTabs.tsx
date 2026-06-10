@@ -115,7 +115,13 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
         </p>
       )}
 
-      {esBracket ? (
+      {fecha?.label.toLowerCase().includes('suspendida') ? (
+        <div className="flex flex-col items-center justify-center py-12 text-center text-gray-400">
+          <span className="text-4xl mb-3">🌧️</span>
+          <p className="font-semibold text-gray-500">Fecha suspendida por lluvia</p>
+          <p className="text-xs mt-1">Los partidos fueron reagendados para el 17.06</p>
+        </div>
+      ) : esBracket ? (
         /* ── Bracket Semifinales / Cuartos de Final ─────────────────────── */
         <div className="space-y-4">
           <p className="text-xs text-gray-400 -mt-1">Se actualiza según posiciones actuales</p>
