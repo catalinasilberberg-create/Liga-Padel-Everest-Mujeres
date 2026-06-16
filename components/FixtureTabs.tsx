@@ -98,21 +98,46 @@ function getMatchResult(
   }
 }
 
-function MatchRow({ label, a, b, labelColor }: { label: string; a: string; b: string; labelColor?: string }) {
+function MatchRow({ label, a, b, labelColor, hora, lugar, cancha }: {
+  label: string; a: string; b: string; labelColor?: string
+  hora?: string; lugar?: string; cancha?: string
+}) {
   return (
     <div className="flex items-center gap-2 py-1.5">
-      <span
-        className="shrink-0 text-[10px] font-bold w-12 text-right"
-        style={{ color: labelColor ?? '#6b7280' }}
-      >
-        {label}
-      </span>
+      <div className="shrink-0 w-16 text-center">
+        {hora ? (
+          <>
+            <div className="text-xs font-bold" style={{ color: labelColor ?? '#6b7280' }}>{hora}</div>
+            <div className="text-[10px] text-gray-400">{lugar} C{cancha}</div>
+          </>
+        ) : (
+          <span className="text-[10px] font-bold" style={{ color: labelColor ?? '#6b7280' }}>{label}</span>
+        )}
+      </div>
       <span className="flex-1 min-w-0 text-xs font-medium text-gray-800 truncate">{a}</span>
       <span className="text-xs text-gray-300 shrink-0">vs</span>
       <span className="flex-1 min-w-0 text-xs font-medium text-gray-800 truncate text-right">{b}</span>
     </div>
   )
 }
+
+const D_CATS = [
+  { key: 'd_copa_oro'     as const, label: 'D — Copa Oro',
+    sf1:  { hora: '18:00', lugar: 'PLT',     cancha: '1' },
+    sf2:  { hora: '18:00', lugar: 'PLT',     cancha: '2' },
+    final:{ hora: '19:00', lugar: 'PLT',     cancha: '2' },
+    p56:  { hora: '18:30', lugar: 'Everest', cancha: '1' } },
+  { key: 'd_copa_plata_1' as const, label: 'D — Copa Plata 1',
+    sf1:  { hora: '18:00', lugar: 'PLT',     cancha: '3' },
+    sf2:  { hora: '18:00', lugar: 'PLT',     cancha: '4' },
+    final:{ hora: '19:00', lugar: 'PLT',     cancha: '3' },
+    p56:  { hora: '18:30', lugar: 'Everest', cancha: '2' } },
+  { key: 'd_copa_plata_2' as const, label: 'D — Copa Plata 2',
+    sf1:  { hora: '18:00', lugar: 'PLT',     cancha: '5' },
+    sf2:  { hora: '18:00', lugar: 'PLT',     cancha: '6' },
+    final:{ hora: '19:00', lugar: 'PLT',     cancha: '4' },
+    p56:  { hora: '19:30', lugar: 'Everest', cancha: '1' } },
+]
 
 export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaId, finalsFechaId }: Props) {
   const [fechaSeleccionada, setFechaSeleccionada] = useState<number>(
@@ -131,9 +156,6 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
   // ── Standings para finales (excluye bracket + finales fechas) ────────
   const excludeForFinals = [bracketFechaId, finalsFechaId].filter((x): x is number => x !== undefined)
   const stPrincFin = esFinals ? getStandings(partidos, 'principiante',   excludeForFinals) : []
-  const stDOroFin  = [] as Standing[]
-  const stDP1Fin   = [] as Standing[]
-  const stDP2Fin   = [] as Standing[]
 
   // ── C− todo estático: los cruces dependen de QF (hoy) y no se pueden computar
   // dinámicamente sin riesgo de desfase de posiciones. El 07.07 se ven los resultados reales.
@@ -157,19 +179,6 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
   const p78a    = p58?.loserName   ?? 'Perd. P3'
   const p78b    = p68?.loserName   ?? 'Perd. P4'
 
-  // ── D finals helper — SF y 5°/6° muestran posiciones, no nombres
-  // (posiciones se confirman tras última fecha regular el 17.06)
-  const buildDFinals = (_st: Standing[]) => {
-    return {
-      sf1a: '1° lugar', sf1b: '4° lugar',
-      sf2a: '2° lugar', sf2b: '3° lugar',
-      finalA: 'Gan. SF1', finalB: 'Gan. SF2',
-      p56a: '5° lugar',  p56b: '6° lugar',
-    }
-  }
-  const dOro = esFinals ? buildDFinals(stDOroFin) : null
-  const dP1  = esFinals ? buildDFinals(stDP1Fin)  : null
-  const dP2  = esFinals ? buildDFinals(stDP2Fin)  : null
 
   return (
     <div>
@@ -377,7 +386,7 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
                   <span className="text-[10px] font-bold uppercase tracking-wider text-white">Final</span>
                 </div>
                 <div className="px-3 py-1">
-                  <MatchRow label="1°/2°" a={pFinalA} b={pFinalB} labelColor="#6d28d9" />
+                  <MatchRow label="1°/2°" a={pFinalA} b={pFinalB} labelColor="#6d28d9" hora="19:00" lugar="PLT" cancha="1" />
                 </div>
               </div>
               <div>
@@ -385,21 +394,16 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
                   <span className="text-[10px] font-bold uppercase tracking-wider text-white">Demás Lugares</span>
                 </div>
                 <div className="px-3 py-1 divide-y divide-gray-50">
-                  <MatchRow label="3°/4°"  a={p34a} b={p34b} />
-                  <MatchRow label="5°/6°"  a={p56a} b={p56b} />
-                  <MatchRow label="7°/8°"  a={p78a} b={p78b} />
+                  <MatchRow label="3°/4°" a={p34a} b={p34b} hora="19:00" lugar="PLT" cancha="8" />
+                  <MatchRow label="5°/6°" a={p56a} b={p56b} hora="19:00" lugar="PLT" cancha="9" />
+                  <MatchRow label="7°/8°" a={p78a} b={p78b} hora="19:00" lugar="PLT" cancha="10" />
                 </div>
               </div>
             </div>
           </div>
 
           {/* D categories */}
-          {([
-            { label: 'D — Copa Oro',     d: dOro, key: 'd_copa_oro'     },
-            { label: 'D — Copa Plata 1', d: dP1,  key: 'd_copa_plata_1' },
-            { label: 'D — Copa Plata 2', d: dP2,  key: 'd_copa_plata_2' },
-          ] as const).map(({ label, d, key }) => {
-            if (!d) return null
+          {D_CATS.map(({ key, label, sf1, sf2, final: fin, p56 }) => {
             const color = getColorGrupo(key)
             return (
               <div key={key} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -412,8 +416,8 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
                       <span className="text-[10px] font-bold uppercase tracking-wider text-white">Semifinales</span>
                     </div>
                     <div className="px-3 py-1 divide-y divide-gray-50">
-                      <MatchRow label="SF1" a={d.sf1a} b={d.sf1b} labelColor={color.header} />
-                      <MatchRow label="SF2" a={d.sf2a} b={d.sf2b} labelColor={color.header} />
+                      <MatchRow label="SF1" a="1° lugar" b="4° lugar" labelColor={color.header} hora={sf1.hora} lugar={sf1.lugar} cancha={sf1.cancha} />
+                      <MatchRow label="SF2" a="2° lugar" b="3° lugar" labelColor={color.header} hora={sf2.hora} lugar={sf2.lugar} cancha={sf2.cancha} />
                     </div>
                   </div>
                   <div>
@@ -421,7 +425,7 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
                       <span className="text-[10px] font-bold uppercase tracking-wider text-white">Final</span>
                     </div>
                     <div className="px-3 py-1">
-                      <MatchRow label="1°/2°" a={d.finalA} b={d.finalB} labelColor={color.header} />
+                      <MatchRow label="1°/2°" a="Gan. SF1" b="Gan. SF2" labelColor={color.header} hora={fin.hora} lugar={fin.lugar} cancha={fin.cancha} />
                     </div>
                   </div>
                   <div>
@@ -429,7 +433,7 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
                       <span className="text-[10px] font-bold uppercase tracking-wider text-white">5° / 6° Lugar</span>
                     </div>
                     <div className="px-3 py-1">
-                      <MatchRow label="5°/6°" a={d.p56a} b={d.p56b} />
+                      <MatchRow label="5°/6°" a="5° lugar" b="6° lugar" hora={p56.hora} lugar={p56.lugar} cancha={p56.cancha} />
                     </div>
                   </div>
                 </div>
@@ -448,8 +452,8 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
                   <span className="text-[10px] font-bold uppercase tracking-wider text-white">Semifinales</span>
                 </div>
                 <div className="px-3 py-1 divide-y divide-gray-50">
-                  <MatchRow label="SF1" a={cmSF1a} b={cmSF1b} labelColor="#156082" />
-                  <MatchRow label="SF2" a={cmSF2a} b={cmSF2b} labelColor="#156082" />
+                  <MatchRow label="SF1" a={cmSF1a} b={cmSF1b} labelColor="#156082" hora="18:00" lugar="PLT" cancha="7" />
+                  <MatchRow label="SF2" a={cmSF2a} b={cmSF2b} labelColor="#156082" hora="18:00" lugar="PLT" cancha="8" />
                 </div>
               </div>
               <div>
@@ -457,7 +461,7 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
                   <span className="text-[10px] font-bold uppercase tracking-wider text-white">Final</span>
                 </div>
                 <div className="px-3 py-1">
-                  <MatchRow label="1°/2°" a={cmFinalA} b={cmFinalB} labelColor="#156082" />
+                  <MatchRow label="1°/2°" a={cmFinalA} b={cmFinalB} labelColor="#156082" hora="19:00" lugar="PLT" cancha="5" />
                 </div>
               </div>
               <div>
@@ -465,8 +469,9 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
                   <span className="text-[10px] font-bold uppercase tracking-wider text-white">Demás Lugares</span>
                 </div>
                 <div className="px-3 py-1 divide-y divide-gray-50">
-                  <MatchRow label="5°/6°" a={cm5a} b={cm5b} />
-                  <MatchRow label="7°/8°" a={cm7a} b={cm7b} />
+                  <MatchRow label="5°/6°"   a={cm5a} b={cm5b} hora="19:00" lugar="PLT"     cancha="9"  />
+                  <MatchRow label="7°/8°"   a={cm7a} b={cm7b} hora="19:30" lugar="Everest" cancha="2"  />
+                  <MatchRow label="Amistoso" a="9° C−" b="10° C−" hora="19:00" lugar="PLT" cancha="10" />
                 </div>
               </div>
             </div>
