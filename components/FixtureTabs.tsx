@@ -152,10 +152,10 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
   const pFinalB = pSF2?.winnerName ?? 'Gan. SF2'
   const p34a    = pSF1?.loserName  ?? 'Perd. SF1'
   const p34b    = pSF2?.loserName  ?? 'Perd. SF2'
-  const p56a    = p58?.winnerName  ?? 'Gan. 5° vs 8°'
-  const p56b    = p68?.winnerName  ?? 'Gan. 6° vs 7°'
-  const p78a    = p58?.loserName   ?? 'Perd. 5° vs 8°'
-  const p78b    = p68?.loserName   ?? 'Perd. 6° vs 7°'
+  const p56a    = p58?.winnerName  ?? 'Gan. P5 vs P8'
+  const p56b    = p68?.winnerName  ?? 'Gan. P6 vs P7'
+  const p78a    = p58?.loserName   ?? 'Perd. P5 vs P8'
+  const p78b    = p68?.loserName   ?? 'Perd. P6 vs P7'
 
   // ── D finals helper — SF y 5°/6° muestran posiciones, no nombres
   // (posiciones se confirman tras última fecha regular el 17.06)
