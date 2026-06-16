@@ -131,35 +131,17 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
   // ── Standings para finales (excluye bracket + finales fechas) ────────
   const excludeForFinals = [bracketFechaId, finalsFechaId].filter((x): x is number => x !== undefined)
   const stPrincFin = esFinals ? getStandings(partidos, 'principiante',   excludeForFinals) : []
-  const stCMFin    = esFinals ? getStandings(partidos, 'c_menos',        excludeForFinals) : []
   const stDOroFin  = esFinals ? getStandings(partidos, 'd_copa_oro',      finalsFechaId)   : []
   const stDP1Fin   = esFinals ? getStandings(partidos, 'd_copa_plata_1',  finalsFechaId)   : []
   const stDP2Fin   = esFinals ? getStandings(partidos, 'd_copa_plata_2',  finalsFechaId)   : []
 
-  // ── C− QF results (de bracketFechaId) → SF matchups ─────────────────
-  const cf = esFinals ? [
-    getMatchResult(partidos, stCMFin[0]?.id, stCMFin[7]?.id, bracketFechaId), // CF1: 1° vs 8°
-    getMatchResult(partidos, stCMFin[1]?.id, stCMFin[6]?.id, bracketFechaId), // CF2: 2° vs 7°
-    getMatchResult(partidos, stCMFin[2]?.id, stCMFin[5]?.id, bracketFechaId), // CF3: 3° vs 6°
-    getMatchResult(partidos, stCMFin[3]?.id, stCMFin[4]?.id, bracketFechaId), // CF4: 4° vs 5°
-  ] as (MatchResult | null)[] : [null, null, null, null]
-
-  const cmSF1aId = cf[0]?.winnerId, cmSF1bId = cf[3]?.winnerId
-  const cmSF2aId = cf[1]?.winnerId, cmSF2bId = cf[2]?.winnerId
-  const cmSF1a = cf[0]?.winnerName ?? 'Gan. CF1'
-  const cmSF1b = cf[3]?.winnerName ?? 'Gan. CF4'
-  const cmSF2a = cf[1]?.winnerName ?? 'Gan. CF2'
-  const cmSF2b = cf[2]?.winnerName ?? 'Gan. CF3'
-  const cm5a   = cf[0]?.loserName  ?? 'Perd. CF1'
-  const cm5b   = cf[3]?.loserName  ?? 'Perd. CF4'
-  const cm7a   = cf[1]?.loserName  ?? 'Perd. CF2'
-  const cm7b   = cf[2]?.loserName  ?? 'Perd. CF3'
-
-  // C− SF results (de finalsFechaId) → Final
-  const cmSF1Res = getMatchResult(partidos, cmSF1aId, cmSF1bId, finalsFechaId)
-  const cmSF2Res = getMatchResult(partidos, cmSF2aId, cmSF2bId, finalsFechaId)
-  const cmFinalA = cmSF1Res?.winnerName ?? 'Gan. SF1'
-  const cmFinalB = cmSF2Res?.winnerName ?? 'Gan. SF2'
+  // ── C− todo estático: los cruces dependen de QF (hoy) y no se pueden computar
+  // dinámicamente sin riesgo de desfase de posiciones. El 07.07 se ven los resultados reales.
+  const cmSF1a = 'Gan. CF1', cmSF1b = 'Gan. CF4'
+  const cmSF2a = 'Gan. CF2', cmSF2b = 'Gan. CF3'
+  const cm5a   = 'Perd. CF1', cm5b  = 'Perd. CF4'
+  const cm7a   = 'Perd. CF2', cm7b  = 'Perd. CF3'
+  const cmFinalA = 'Gan. SF1', cmFinalB = 'Gan. SF2'
 
   // ── Principiante SF results (de bracketFechaId) → Finales ────────────
   const pSF1 = getMatchResult(partidos, stPrincFin[0]?.id, stPrincFin[3]?.id, bracketFechaId)
