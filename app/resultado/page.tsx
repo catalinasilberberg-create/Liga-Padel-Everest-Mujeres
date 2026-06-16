@@ -46,12 +46,9 @@ export default function ResultadoJugadoraPage() {
     })
     supabase.from('fechas').select('*').order('numero').then(({ data }) => {
       if (data) {
+        setFechas(data)
         const hoy = new Date().toISOString().split('T')[0]
-        // Mostrar fechas ya jugadas o próxima
-        const visibles = data.filter((f) => f.fecha <= hoy || data.indexOf(f) === data.findIndex((x) => x.fecha >= hoy))
-        setFechas(visibles.length > 0 ? visibles : data)
-        // Default a la más reciente
-        const reciente = [...data].reverse().find((f) => f.fecha <= hoy) ?? data[0]
+        const reciente = [...data].reverse().find((f) => f.fecha <= hoy) ?? data[data.length - 1]
         if (reciente) setFechaId(reciente.id)
       }
     })
