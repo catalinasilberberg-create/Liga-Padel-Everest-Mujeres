@@ -131,9 +131,9 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
   // ── Standings para finales (excluye bracket + finales fechas) ────────
   const excludeForFinals = [bracketFechaId, finalsFechaId].filter((x): x is number => x !== undefined)
   const stPrincFin = esFinals ? getStandings(partidos, 'principiante',   excludeForFinals) : []
-  const stDOroFin  = esFinals ? getStandings(partidos, 'd_copa_oro',      finalsFechaId)   : []
-  const stDP1Fin   = esFinals ? getStandings(partidos, 'd_copa_plata_1',  finalsFechaId)   : []
-  const stDP2Fin   = esFinals ? getStandings(partidos, 'd_copa_plata_2',  finalsFechaId)   : []
+  const stDOroFin  = [] as Standing[]
+  const stDP1Fin   = [] as Standing[]
+  const stDP2Fin   = [] as Standing[]
 
   // ── C− todo estático: los cruces dependen de QF (hoy) y no se pueden computar
   // dinámicamente sin riesgo de desfase de posiciones. El 07.07 se ven los resultados reales.
@@ -157,19 +157,14 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
   const p78a    = p58?.loserName   ?? 'Perd. 5° vs 8°'
   const p78b    = p68?.loserName   ?? 'Perd. 6° vs 7°'
 
-  // ── D finals helper ───────────────────────────────────────────────────
-  const buildDFinals = (st: Standing[]) => {
-    const sf1Res = getMatchResult(partidos, st[0]?.id, st[3]?.id, finalsFechaId)
-    const sf2Res = getMatchResult(partidos, st[1]?.id, st[2]?.id, finalsFechaId)
+  // ── D finals helper — SF y 5°/6° muestran posiciones, no nombres
+  // (posiciones se confirman tras última fecha regular el 17.06)
+  const buildDFinals = (_st: Standing[]) => {
     return {
-      sf1a:   st[0]?.nombre ?? '1°',
-      sf1b:   st[3]?.nombre ?? '4°',
-      sf2a:   st[1]?.nombre ?? '2°',
-      sf2b:   st[2]?.nombre ?? '3°',
-      finalA: sf1Res?.winnerName ?? 'Gan. SF1',
-      finalB: sf2Res?.winnerName ?? 'Gan. SF2',
-      p56a:   st[4]?.nombre ?? '5°',
-      p56b:   st[5]?.nombre ?? '6°',
+      sf1a: '1° lugar', sf1b: '4° lugar',
+      sf2a: '2° lugar', sf2b: '3° lugar',
+      finalA: 'Gan. SF1', finalB: 'Gan. SF2',
+      p56a: '5° lugar',  p56b: '6° lugar',
     }
   }
   const dOro = esFinals ? buildDFinals(stDOroFin) : null
