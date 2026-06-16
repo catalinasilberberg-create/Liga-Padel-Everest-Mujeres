@@ -146,14 +146,14 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
 
   const cmSF1aId = cf[0]?.winnerId, cmSF1bId = cf[3]?.winnerId
   const cmSF2aId = cf[1]?.winnerId, cmSF2bId = cf[2]?.winnerId
-  const cmSF1a = cf[0]?.winnerName ?? `Gan. ${stCMFin[0]?.nombre ?? 'CF1'}`
-  const cmSF1b = cf[3]?.winnerName ?? `Gan. ${stCMFin[3]?.nombre ?? 'CF4'}`
-  const cmSF2a = cf[1]?.winnerName ?? `Gan. ${stCMFin[1]?.nombre ?? 'CF2'}`
-  const cmSF2b = cf[2]?.winnerName ?? `Gan. ${stCMFin[2]?.nombre ?? 'CF3'}`
-  const cm5a   = cf[0]?.loserName  ?? `Perd. ${stCMFin[0]?.nombre ?? 'CF1'}`
-  const cm5b   = cf[3]?.loserName  ?? `Perd. ${stCMFin[3]?.nombre ?? 'CF4'}`
-  const cm7a   = cf[1]?.loserName  ?? `Perd. ${stCMFin[1]?.nombre ?? 'CF2'}`
-  const cm7b   = cf[2]?.loserName  ?? `Perd. ${stCMFin[2]?.nombre ?? 'CF3'}`
+  const cmSF1a = cf[0]?.winnerName ?? 'Gan. CF1'
+  const cmSF1b = cf[3]?.winnerName ?? 'Gan. CF4'
+  const cmSF2a = cf[1]?.winnerName ?? 'Gan. CF2'
+  const cmSF2b = cf[2]?.winnerName ?? 'Gan. CF3'
+  const cm5a   = cf[0]?.loserName  ?? 'Perd. CF1'
+  const cm5b   = cf[3]?.loserName  ?? 'Perd. CF4'
+  const cm7a   = cf[1]?.loserName  ?? 'Perd. CF2'
+  const cm7b   = cf[2]?.loserName  ?? 'Perd. CF3'
 
   // C− SF results (de finalsFechaId) → Final
   const cmSF1Res = getMatchResult(partidos, cmSF1aId, cmSF1bId, finalsFechaId)
@@ -166,12 +166,12 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
   const pSF2 = getMatchResult(partidos, stPrincFin[1]?.id, stPrincFin[2]?.id, bracketFechaId)
   const p58  = getMatchResult(partidos, stPrincFin[4]?.id, stPrincFin[7]?.id, bracketFechaId)
   const p68  = getMatchResult(partidos, stPrincFin[5]?.id, stPrincFin[6]?.id, bracketFechaId)
-  const pFinalA = pSF1?.winnerName ?? `Gan. ${stPrincFin[0]?.nombre ?? 'SF1'}`
-  const pFinalB = pSF2?.winnerName ?? `Gan. ${stPrincFin[1]?.nombre ?? 'SF2'}`
+  const pFinalA = pSF1?.winnerName ?? 'Gan. SF1'
+  const pFinalB = pSF2?.winnerName ?? 'Gan. SF2'
   const p34a    = pSF1?.loserName  ?? 'Perd. SF1'
   const p34b    = pSF2?.loserName  ?? 'Perd. SF2'
-  const p56a    = p58?.winnerName  ?? `Gan. ${stPrincFin[4]?.nombre ?? '5° vs 8°'}`
-  const p56b    = p68?.winnerName  ?? `Gan. ${stPrincFin[5]?.nombre ?? '6° vs 7°'}`
+  const p56a    = p58?.winnerName  ?? 'Gan. 5° vs 8°'
+  const p56b    = p68?.winnerName  ?? 'Gan. 6° vs 7°'
   const p78a    = p58?.loserName   ?? 'Perd. 5° vs 8°'
   const p78b    = p68?.loserName   ?? 'Perd. 6° vs 7°'
 
