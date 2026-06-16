@@ -20,7 +20,7 @@ export default async function FixturePage() {
 
   // Mostrar fechas con partidos cargados (≥5) + siempre mostrar la fecha de bracket
   const fechasMostrar = [...fechas]
-    .filter((f) => (conteoPorFecha[f.id] ?? 0) >= 5 || f.id === BRACKET_FECHA_ID || f.id === 10)
+    .filter((f) => (conteoPorFecha[f.id] ?? 0) >= 5 || f.id === BRACKET_FECHA_ID)
     .reverse()
 
   const proximaId = proxima?.id ?? fechasMostrar[0]?.id ?? null
