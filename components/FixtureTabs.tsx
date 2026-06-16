@@ -19,24 +19,31 @@ interface Props {
   partidos: Partido[]
   proximaId?: number | null
   bracketFechaId?: number
+  finalsFechaId?: number
 }
+
+type Standing = { id: number; nombre: string; pts: number; dif: number }
+type MatchResult = { winnerId: number; loserId: number; winnerName: string; loserName: string }
 
 const formatTabDate = (fechaStr: string) => {
   const [, mes, dia] = fechaStr.split('-')
   return `${dia}.${mes}`
 }
 
-// Calcula tabla de posiciones para un grupo a partir de todos los partidos jugados
 function getStandings(
   partidos: Partido[],
   grupo: Grupo,
-  excludeFechaId?: number
-): { id: number; nombre: string; pts: number; dif: number }[] {
+  excludeFechaIds?: number | number[]
+): Standing[] {
+  const excludeSet = new Set<number>(
+    excludeFechaIds === undefined ? [] :
+    Array.isArray(excludeFechaIds) ? excludeFechaIds : [excludeFechaIds]
+  )
   const stats: Record<number, { nombre: string; pts: number; dif: number }> = {}
 
   for (const p of partidos) {
     if (!p.jugado || p.set1_p1 === null) continue
-    if (excludeFechaId && p.fecha_id === excludeFechaId) continue
+    if (excludeSet.has(p.fecha_id)) continue
     const totalGames = (p.set1_p1 ?? 0) + (p.set1_p2 ?? 0) + (p.set2_p1 ?? 0) + (p.set2_p2 ?? 0)
     if (totalGames === 0) continue
 
@@ -64,11 +71,50 @@ function getStandings(
     .sort((a, b) => b.pts - a.pts || b.dif - a.dif)
 }
 
-function slot(st: { nombre: string }[], pos: number): string {
+function slot(st: Standing[], pos: number): string {
   return st[pos - 1]?.nombre ?? `${pos}° del grupo`
 }
 
-export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaId }: Props) {
+function getMatchResult(
+  partidos: Partido[],
+  id1: number | undefined,
+  id2: number | undefined,
+  fechaId: number | undefined
+): MatchResult | null {
+  if (!id1 || !id2 || !fechaId) return null
+  const p = partidos.find((p) =>
+    p.fecha_id === fechaId &&
+    ((p.pareja1_id === id1 && p.pareja2_id === id2) ||
+     (p.pareja1_id === id2 && p.pareja2_id === id1))
+  )
+  if (!p?.jugado || p.set1_p1 === null) return null
+  const pts = calcularPuntos(p)
+  const p1Wins = pts.p1 > pts.p2
+  return {
+    winnerId:   p1Wins ? p.pareja1_id : p.pareja2_id,
+    loserId:    p1Wins ? p.pareja2_id : p.pareja1_id,
+    winnerName: (p1Wins ? p.pareja1?.nombre : p.pareja2?.nombre) ?? '',
+    loserName:  (p1Wins ? p.pareja2?.nombre : p.pareja1?.nombre) ?? '',
+  }
+}
+
+function MatchRow({ label, a, b, labelColor }: { label: string; a: string; b: string; labelColor?: string }) {
+  return (
+    <div className="flex items-center gap-2 py-1.5">
+      <span
+        className="shrink-0 text-[10px] font-bold w-12 text-right"
+        style={{ color: labelColor ?? '#6b7280' }}
+      >
+        {label}
+      </span>
+      <span className="flex-1 min-w-0 text-xs font-medium text-gray-800 truncate">{a}</span>
+      <span className="text-xs text-gray-300 shrink-0">vs</span>
+      <span className="flex-1 min-w-0 text-xs font-medium text-gray-800 truncate text-right">{b}</span>
+    </div>
+  )
+}
+
+export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaId, finalsFechaId }: Props) {
   const [fechaSeleccionada, setFechaSeleccionada] = useState<number>(
     proximaId ?? fechas[0]?.id ?? 0
   )
@@ -76,17 +122,84 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
   const fecha = fechas.find((f) => f.id === fechaSeleccionada)
   const partidosFecha = partidos.filter((p) => p.fecha_id === fechaSeleccionada)
   const esBracket = bracketFechaId !== undefined && fechaSeleccionada === bracketFechaId
+  const esFinals  = finalsFechaId  !== undefined && fechaSeleccionada === finalsFechaId
 
-  // Standings para el bracket (excluye la propia fecha del bracket)
+  // ── Standings para el bracket (excluye bracket fecha) ────────────────
   const stPrincipiante = esBracket ? getStandings(partidos, 'principiante', bracketFechaId) : []
   const stCMenos       = esBracket ? getStandings(partidos, 'c_menos',      bracketFechaId) : []
+
+  // ── Standings para finales (excluye bracket + finales fechas) ────────
+  const excludeForFinals = [bracketFechaId, finalsFechaId].filter((x): x is number => x !== undefined)
+  const stPrincFin = esFinals ? getStandings(partidos, 'principiante',   excludeForFinals) : []
+  const stCMFin    = esFinals ? getStandings(partidos, 'c_menos',        excludeForFinals) : []
+  const stDOroFin  = esFinals ? getStandings(partidos, 'd_copa_oro',      finalsFechaId)   : []
+  const stDP1Fin   = esFinals ? getStandings(partidos, 'd_copa_plata_1',  finalsFechaId)   : []
+  const stDP2Fin   = esFinals ? getStandings(partidos, 'd_copa_plata_2',  finalsFechaId)   : []
+
+  // ── C− QF results (de bracketFechaId) → SF matchups ─────────────────
+  const cf = esFinals ? [
+    getMatchResult(partidos, stCMFin[0]?.id, stCMFin[7]?.id, bracketFechaId), // CF1: 1° vs 8°
+    getMatchResult(partidos, stCMFin[1]?.id, stCMFin[6]?.id, bracketFechaId), // CF2: 2° vs 7°
+    getMatchResult(partidos, stCMFin[2]?.id, stCMFin[5]?.id, bracketFechaId), // CF3: 3° vs 6°
+    getMatchResult(partidos, stCMFin[3]?.id, stCMFin[4]?.id, bracketFechaId), // CF4: 4° vs 5°
+  ] as (MatchResult | null)[] : [null, null, null, null]
+
+  const cmSF1aId = cf[0]?.winnerId, cmSF1bId = cf[3]?.winnerId
+  const cmSF2aId = cf[1]?.winnerId, cmSF2bId = cf[2]?.winnerId
+  const cmSF1a = cf[0]?.winnerName ?? `Gan. ${stCMFin[0]?.nombre ?? 'CF1'}`
+  const cmSF1b = cf[3]?.winnerName ?? `Gan. ${stCMFin[3]?.nombre ?? 'CF4'}`
+  const cmSF2a = cf[1]?.winnerName ?? `Gan. ${stCMFin[1]?.nombre ?? 'CF2'}`
+  const cmSF2b = cf[2]?.winnerName ?? `Gan. ${stCMFin[2]?.nombre ?? 'CF3'}`
+  const cm5a   = cf[0]?.loserName  ?? `Perd. ${stCMFin[0]?.nombre ?? 'CF1'}`
+  const cm5b   = cf[3]?.loserName  ?? `Perd. ${stCMFin[3]?.nombre ?? 'CF4'}`
+  const cm7a   = cf[1]?.loserName  ?? `Perd. ${stCMFin[1]?.nombre ?? 'CF2'}`
+  const cm7b   = cf[2]?.loserName  ?? `Perd. ${stCMFin[2]?.nombre ?? 'CF3'}`
+
+  // C− SF results (de finalsFechaId) → Final
+  const cmSF1Res = getMatchResult(partidos, cmSF1aId, cmSF1bId, finalsFechaId)
+  const cmSF2Res = getMatchResult(partidos, cmSF2aId, cmSF2bId, finalsFechaId)
+  const cmFinalA = cmSF1Res?.winnerName ?? 'Gan. SF1'
+  const cmFinalB = cmSF2Res?.winnerName ?? 'Gan. SF2'
+
+  // ── Principiante SF results (de bracketFechaId) → Finales ────────────
+  const pSF1 = getMatchResult(partidos, stPrincFin[0]?.id, stPrincFin[3]?.id, bracketFechaId)
+  const pSF2 = getMatchResult(partidos, stPrincFin[1]?.id, stPrincFin[2]?.id, bracketFechaId)
+  const p58  = getMatchResult(partidos, stPrincFin[4]?.id, stPrincFin[7]?.id, bracketFechaId)
+  const p68  = getMatchResult(partidos, stPrincFin[5]?.id, stPrincFin[6]?.id, bracketFechaId)
+  const pFinalA = pSF1?.winnerName ?? `Gan. ${stPrincFin[0]?.nombre ?? 'SF1'}`
+  const pFinalB = pSF2?.winnerName ?? `Gan. ${stPrincFin[1]?.nombre ?? 'SF2'}`
+  const p34a    = pSF1?.loserName  ?? 'Perd. SF1'
+  const p34b    = pSF2?.loserName  ?? 'Perd. SF2'
+  const p56a    = p58?.winnerName  ?? `Gan. ${stPrincFin[4]?.nombre ?? '5° vs 8°'}`
+  const p56b    = p68?.winnerName  ?? `Gan. ${stPrincFin[5]?.nombre ?? '6° vs 7°'}`
+  const p78a    = p58?.loserName   ?? 'Perd. 5° vs 8°'
+  const p78b    = p68?.loserName   ?? 'Perd. 6° vs 7°'
+
+  // ── D finals helper ───────────────────────────────────────────────────
+  const buildDFinals = (st: Standing[]) => {
+    const sf1Res = getMatchResult(partidos, st[0]?.id, st[3]?.id, finalsFechaId)
+    const sf2Res = getMatchResult(partidos, st[1]?.id, st[2]?.id, finalsFechaId)
+    return {
+      sf1a:   st[0]?.nombre ?? '1°',
+      sf1b:   st[3]?.nombre ?? '4°',
+      sf2a:   st[1]?.nombre ?? '2°',
+      sf2b:   st[2]?.nombre ?? '3°',
+      finalA: sf1Res?.winnerName ?? 'Gan. SF1',
+      finalB: sf2Res?.winnerName ?? 'Gan. SF2',
+      p56a:   st[4]?.nombre ?? '5°',
+      p56b:   st[5]?.nombre ?? '6°',
+    }
+  }
+  const dOro = esFinals ? buildDFinals(stDOroFin) : null
+  const dP1  = esFinals ? buildDFinals(stDP1Fin)  : null
+  const dP2  = esFinals ? buildDFinals(stDP2Fin)  : null
 
   return (
     <div>
       {/* Tab bar */}
       <div className="flex gap-1.5 overflow-x-auto pb-2 mb-4 scrollbar-hide">
         {fechas.map((f) => {
-          const activa   = f.id === fechaSeleccionada
+          const activa    = f.id === fechaSeleccionada
           const esProxima = f.id === proximaId
           return (
             <button
@@ -121,18 +234,18 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
           <p className="font-semibold text-gray-500">Fecha suspendida por lluvia</p>
           <p className="text-xs mt-1">Los partidos fueron reagendados para el 17.06</p>
         </div>
+
       ) : esBracket ? (
         /* ── Bracket Semifinales / Cuartos de Final ─────────────────────── */
         <div className="space-y-4">
           <p className="text-xs text-gray-400 -mt-1">Se actualiza según posiciones actuales</p>
 
-          {/* ── Principiante: Semifinales ── */}
+          {/* Principiante: Semifinales */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="px-4 py-2.5 bg-[#6d28d9] text-white">
               <h3 className="font-bold text-sm uppercase tracking-wider">Principiante — Semifinales</h3>
             </div>
             <div className="flex">
-              {/* Partidos */}
               <div className="flex-1 min-w-0 divide-y divide-gray-100">
                 <div className="px-3 py-1 divide-y divide-gray-50">
                   {[
@@ -167,7 +280,6 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
                   ))}
                 </div>
               </div>
-              {/* Etiquetas: flex-col flex-1 → siempre 50/50 */}
               <div className="flex flex-col shrink-0 w-[4.5rem]">
                 <div className="flex-1 bg-green-600 flex items-center justify-center px-2">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-white text-center leading-tight">SEMI<br/>FINALES</span>
@@ -179,7 +291,7 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
             </div>
           </div>
 
-          {/* Categoría D: Plata 1, Plata 2, Oro */}
+          {/* Categoría D */}
           {GRUPOS.filter((g) => g.key.startsWith('d_')).map((g) => {
             const gPartidos = partidosFecha.filter((p) => p.pareja1?.grupo === g.key)
             if (gPartidos.length === 0) return null
@@ -203,13 +315,11 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
             )
           })}
 
-          {/* ── C−: Cuartos de Final ── */}
+          {/* C−: Cuartos de Final */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="px-4 py-2.5 bg-[#156082] text-white">
               <h3 className="font-bold text-sm uppercase tracking-wider">C− — Cuartos de Final</h3>
             </div>
-
-            {/* QF rows */}
             <div className="border-b border-gray-100">
               <div className="px-3 py-1 bg-green-600">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-white">Cuartos de Final</span>
@@ -233,8 +343,6 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
                 ))}
               </div>
             </div>
-
-            {/* 9°/10° row */}
             <div>
               <div className="px-3 py-1 bg-gray-400">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-white">9° / 10° Lugar</span>
@@ -253,7 +361,7 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
             </div>
           </div>
 
-          {/* C+ */}
+          {/* C+ en bracket */}
           {(() => {
             const gPartidos = partidosFecha.filter((p) => p.pareja1?.grupo === 'c_mas')
             if (gPartidos.length === 0) return null
@@ -275,6 +383,141 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
             )
           })()}
         </div>
+
+      ) : esFinals ? (
+        /* ── Finales 07.07 ───────────────────────────────────────────────── */
+        <div className="space-y-4">
+          <p className="text-xs text-gray-400 -mt-1">Se actualiza según resultados anteriores</p>
+
+          {/* Principiante */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="px-4 py-2.5 bg-[#6d28d9] text-white">
+              <h3 className="font-bold text-sm uppercase tracking-wider">Principiante — Finales</h3>
+            </div>
+            <div className="divide-y divide-gray-100">
+              <div>
+                <div className="px-3 py-1 bg-yellow-500">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-white">Final</span>
+                </div>
+                <div className="px-3 py-1">
+                  <MatchRow label="1°/2°" a={pFinalA} b={pFinalB} labelColor="#6d28d9" />
+                </div>
+              </div>
+              <div>
+                <div className="px-3 py-1 bg-gray-400">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-white">Demás Lugares</span>
+                </div>
+                <div className="px-3 py-1 divide-y divide-gray-50">
+                  <MatchRow label="3°/4°"  a={p34a} b={p34b} />
+                  <MatchRow label="5°/6°"  a={p56a} b={p56b} />
+                  <MatchRow label="7°/8°"  a={p78a} b={p78b} />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* D categories */}
+          {([
+            { label: 'D — Copa Oro',     d: dOro, key: 'd_copa_oro'     },
+            { label: 'D — Copa Plata 1', d: dP1,  key: 'd_copa_plata_1' },
+            { label: 'D — Copa Plata 2', d: dP2,  key: 'd_copa_plata_2' },
+          ] as const).map(({ label, d, key }) => {
+            if (!d) return null
+            const color = getColorGrupo(key)
+            return (
+              <div key={key} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="px-4 py-2.5 border-l-4" style={{ borderLeftColor: color.header, backgroundColor: color.bg }}>
+                  <span style={{ color: color.header }} className="text-xs font-bold uppercase tracking-wider">{label}</span>
+                </div>
+                <div className="divide-y divide-gray-100">
+                  <div>
+                    <div className="px-3 py-1 bg-green-600">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-white">Semifinales</span>
+                    </div>
+                    <div className="px-3 py-1 divide-y divide-gray-50">
+                      <MatchRow label="SF1" a={d.sf1a} b={d.sf1b} labelColor={color.header} />
+                      <MatchRow label="SF2" a={d.sf2a} b={d.sf2b} labelColor={color.header} />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="px-3 py-1 bg-yellow-500">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-white">Final</span>
+                    </div>
+                    <div className="px-3 py-1">
+                      <MatchRow label="1°/2°" a={d.finalA} b={d.finalB} labelColor={color.header} />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="px-3 py-1 bg-gray-400">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-white">5° / 6° Lugar</span>
+                    </div>
+                    <div className="px-3 py-1">
+                      <MatchRow label="5°/6°" a={d.p56a} b={d.p56b} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+
+          {/* C− */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="px-4 py-2.5 bg-[#156082] text-white">
+              <h3 className="font-bold text-sm uppercase tracking-wider">C− — Semifinales y Final</h3>
+            </div>
+            <div className="divide-y divide-gray-100">
+              <div>
+                <div className="px-3 py-1 bg-green-600">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-white">Semifinales</span>
+                </div>
+                <div className="px-3 py-1 divide-y divide-gray-50">
+                  <MatchRow label="SF1" a={cmSF1a} b={cmSF1b} labelColor="#156082" />
+                  <MatchRow label="SF2" a={cmSF2a} b={cmSF2b} labelColor="#156082" />
+                </div>
+              </div>
+              <div>
+                <div className="px-3 py-1 bg-yellow-500">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-white">Final</span>
+                </div>
+                <div className="px-3 py-1">
+                  <MatchRow label="1°/2°" a={cmFinalA} b={cmFinalB} labelColor="#156082" />
+                </div>
+              </div>
+              <div>
+                <div className="px-3 py-1 bg-gray-400">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-white">Demás Lugares</span>
+                </div>
+                <div className="px-3 py-1 divide-y divide-gray-50">
+                  <MatchRow label="5°/6°" a={cm5a} b={cm5b} />
+                  <MatchRow label="7°/8°" a={cm7a} b={cm7b} />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* C+ (partidos reales de DB) */}
+          {(() => {
+            const gPartidos = partidosFecha.filter((p) => p.pareja1?.grupo === 'c_mas')
+            if (gPartidos.length === 0) return null
+            const color = getColorGrupo('c_mas')
+            return (
+              <div>
+                <div
+                  style={{ borderLeftColor: color.header, backgroundColor: color.bg }}
+                  className="border-l-4 px-3 py-1 rounded-r-lg mb-1.5"
+                >
+                  <span style={{ color: color.header }} className="text-xs font-bold uppercase tracking-wider">C+</span>
+                </div>
+                <div className="grid gap-1.5 sm:grid-cols-2">
+                  {gPartidos.map((p) => (
+                    <PartidoCard key={p.id} partido={p} grupo="c_mas" />
+                  ))}
+                </div>
+              </div>
+            )
+          })()}
+        </div>
+
       ) : (
         /* ── Partidos normales ──────────────────────────────────────────── */
         <div>

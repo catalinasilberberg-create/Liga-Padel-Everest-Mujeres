@@ -18,9 +18,17 @@ export default async function FixturePage() {
     return acc
   }, {})
 
-  // Mostrar fechas con partidos cargados (≥5) + siempre mostrar la fecha de bracket
+  // Fecha de finales (martes 07.07.2026)
+  const finalesFecha = fechas.find((f) => f.fecha === '2026-07-07')
+  const FINALES_FECHA_ID = finalesFecha?.id
+
+  // Mostrar fechas con partidos cargados (≥5) + siempre mostrar bracket y finales
   const fechasMostrar = [...fechas]
-    .filter((f) => (conteoPorFecha[f.id] ?? 0) >= 5 || f.id === BRACKET_FECHA_ID)
+    .filter((f) =>
+      (conteoPorFecha[f.id] ?? 0) >= 5 ||
+      f.id === BRACKET_FECHA_ID ||
+      (FINALES_FECHA_ID !== undefined && f.id === FINALES_FECHA_ID)
+    )
     .reverse()
 
   const proximaId = proxima?.id ?? fechasMostrar[0]?.id ?? null
@@ -33,6 +41,7 @@ export default async function FixturePage() {
         partidos={partidos}
         proximaId={proximaId}
         bracketFechaId={BRACKET_FECHA_ID}
+        finalsFechaId={FINALES_FECHA_ID}
       />
     </div>
   )
