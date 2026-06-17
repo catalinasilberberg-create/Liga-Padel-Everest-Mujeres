@@ -98,9 +98,9 @@ function getMatchResult(
   }
 }
 
-function MatchRow({ label, a, b, labelColor, hora, lugar, cancha }: {
+function MatchRow({ label, a, b, labelColor, hora, lugar, cancha, porDefinir }: {
   label: string; a: string; b: string; labelColor?: string
-  hora?: string; lugar?: string; cancha?: string
+  hora?: string; lugar?: string; cancha?: string; porDefinir?: boolean
 }) {
   return (
     <div className="flex items-center gap-2 py-1.5">
@@ -110,6 +110,8 @@ function MatchRow({ label, a, b, labelColor, hora, lugar, cancha }: {
             <div className="text-xs font-bold" style={{ color: labelColor ?? '#6b7280' }}>{hora}</div>
             <div className="text-[10px] text-gray-400">{lugar} C{cancha}</div>
           </>
+        ) : porDefinir ? (
+          <div className="text-[10px] text-gray-400 italic">Por definir</div>
         ) : (
           <span className="text-[10px] font-bold" style={{ color: labelColor ?? '#6b7280' }}>{label}</span>
         )}
@@ -469,9 +471,9 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
                   <span className="text-[10px] font-bold uppercase tracking-wider text-white">Demás Lugares</span>
                 </div>
                 <div className="px-3 py-1 divide-y divide-gray-50">
-                  <MatchRow label="5°/6°"    a={cm5a} b={cm5b} />
+                  <MatchRow label="5°/6°"    a={cm5a} b={cm5b} porDefinir />
                   <MatchRow label="7°/8°"   a={cm7a} b={cm7b} hora="19:30" lugar="Everest" cancha="2" />
-                  <MatchRow label="Amistoso" a="9° C−" b="10° C−" />
+                  <MatchRow label="Amistoso" a="9° C−" b="10° C−" porDefinir />
                 </div>
               </div>
             </div>
