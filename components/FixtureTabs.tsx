@@ -178,21 +178,6 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
   const cmFinalA = cmSF1r?.winnerName || 'Gan. SF1'
   const cmFinalB = cmSF2r?.winnerName || 'Gan. SF2'
 
-  // ── Principiante SF results (de bracketFechaId) → Finales ────────────
-  const pSF1 = getMatchResult(partidos, stPrincFin[0]?.id, stPrincFin[3]?.id, bracketFechaId)
-  const pSF2 = getMatchResult(partidos, stPrincFin[1]?.id, stPrincFin[2]?.id, bracketFechaId)
-
-  // P3/P4: partidos del bracket que NO son SF
-  // stPrincFin da los IDs del top-8 de principiante (seedings originales)
-  const sfTeamIds = new Set([
-    stPrincFin[0]?.id, stPrincFin[1]?.id, stPrincFin[2]?.id, stPrincFin[3]?.id,
-  ].filter((x): x is number => x !== undefined))
-  const allPrincIds = new Set(stPrincFin.map((s) => s.id))
-  const pNonSF = (esFinals && bracketFechaId) ? partidos.filter((p) =>
-    p.fecha_id === bracketFechaId &&
-    (allPrincIds.has(p.pareja1_id) || allPrincIds.has(p.pareja2_id)) &&
-    !( sfTeamIds.has(p.pareja1_id) && sfTeamIds.has(p.pareja2_id) )
-  ) : []
   const mkResult = (p: Partido | undefined): MatchResult | null => {
     if (!p?.jugado || p.set1_p1 === null) return null
     const pts = calcularPuntos(p)
@@ -200,17 +185,37 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
     return {
       winnerId:   p1w ? p.pareja1_id : p.pareja2_id,
       loserId:    p1w ? p.pareja2_id : p.pareja1_id,
-      winnerName: (p1w ? p.pareja1?.nombre : p.pareja2?.nombre) ?? '',
-      loserName:  (p1w ? p.pareja2?.nombre : p.pareja1?.nombre) ?? '',
+      winnerName: (p1w ? p.pareja1?.nombre : p.pareja2?.nombre) || '',
+      loserName:  (p1w ? p.pareja2?.nombre : p.pareja1?.nombre) || '',
     }
   }
-  const p3r = mkResult(pNonSF[0])
-  const p4r = mkResult(pNonSF[1])
 
-  const pFinalA = pSF1?.winnerName || 'Gan. SF1'
-  const pFinalB = pSF2?.winnerName || 'Gan. SF2'
-  const p34a    = pSF1?.loserName  || 'Perd. SF1'
-  const p34b    = pSF2?.loserName  || 'Perd. SF2'
+  // ── Principiante: todos los partidos del bracket ──────────────────────
+  const allPrincIds = new Set(stPrincFin.map((s) => s.id))
+  const sfSeedIds   = new Set(
+    [stPrincFin[0]?.id, stPrincFin[1]?.id, stPrincFin[2]?.id, stPrincFin[3]?.id]
+      .filter((x): x is number => x !== undefined)
+  )
+  const allPrincBracket = (esFinals && bracketFechaId) ? partidos.filter((p) =>
+    p.fecha_id === bracketFechaId &&
+    (allPrincIds.has(p.pareja1_id) || allPrincIds.has(p.pareja2_id))
+  ) : []
+  // SF = partidos donde ambos equipos son top-4 (semis). No-SF = P3/P4.
+  const pSFPartidos = allPrincBracket.filter((p) =>
+    sfSeedIds.has(p.pareja1_id) && sfSeedIds.has(p.pareja2_id)
+  )
+  const pNonSF = allPrincBracket.filter((p) =>
+    !(sfSeedIds.has(p.pareja1_id) && sfSeedIds.has(p.pareja2_id))
+  )
+  const sf1r = mkResult(pSFPartidos[0])
+  const sf2r = mkResult(pSFPartidos[1])
+  const p3r  = mkResult(pNonSF[0])
+  const p4r  = mkResult(pNonSF[1])
+
+  const pFinalA = sf1r?.winnerName || 'Gan. SF1'
+  const pFinalB = sf2r?.winnerName || 'Gan. SF2'
+  const p34a    = sf1r?.loserName  || 'Perd. SF1'
+  const p34b    = sf2r?.loserName  || 'Perd. SF2'
   const p56a    = p3r?.winnerName  || 'Gan. P3'
   const p56b    = p4r?.winnerName  || 'Gan. P4'
   const p78a    = p3r?.loserName   || 'Perd. P3'
