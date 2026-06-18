@@ -151,8 +151,7 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
   const stCMFin    = esFinals ? getStandings(partidos, 'c_menos',      excludeForFinals) : []
 
   // ── Partidos de temporada regular (fechas 1-10) ───────────────────────
-  const fecha10Ids = new Set(fechas.filter((f) => f.numero <= 10).map((f) => f.id))
-  const partidosFecha10 = partidos.filter((p) => fecha10Ids.has(p.fecha_id))
+  const partidosFecha10 = partidos.filter((p) => (p.fecha?.numero ?? 99) <= 10)
 
   // ── D Copa Plata unificada ───────────────────────────────────────────
   const stPlata1 = esFinals ? getStandings(partidosFecha10, 'd_copa_plata_1') : []
