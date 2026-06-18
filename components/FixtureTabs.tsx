@@ -408,7 +408,7 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
         </div>
 
       ) : esFinals ? (
-        /* ── Finales 07.07 ───────────────────────────────────────────────── */
+        /* ── Finales 08.07 ───────────────────────────────────────────────── */
         <div className="space-y-4">
           <p className="text-xs text-gray-400 -mt-1">Se actualiza según resultados anteriores</p>
 

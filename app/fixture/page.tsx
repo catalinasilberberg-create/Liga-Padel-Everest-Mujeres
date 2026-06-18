@@ -18,8 +18,8 @@ export default async function FixturePage() {
     return acc
   }, {})
 
-  // Fecha de finales (martes 07.07.2026)
-  const finalesFecha = fechas.find((f) => f.fecha === '2026-07-07')
+  // Fecha de finales (miércoles 08.07.2026)
+  const finalesFecha = fechas.find((f) => f.fecha === '2026-07-08')
   const FINALES_FECHA_ID = finalesFecha?.id
 
   // Mostrar fechas con partidos cargados (≥5) + siempre mostrar bracket y finales
