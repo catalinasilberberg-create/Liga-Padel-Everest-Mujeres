@@ -20,6 +20,7 @@ interface Props {
   proximaId?: number | null
   bracketFechaId?: number
   finalsFechaId?: number
+  fecha10Ids?: number[]
 }
 
 type Standing = { id: number; nombre: string; pts: number; dif: number }
@@ -131,7 +132,7 @@ const D_CATS = [
     p56:  { hora: '18:30', lugar: 'Everest', cancha: '1' } },
 ]
 
-export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaId, finalsFechaId }: Props) {
+export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaId, finalsFechaId, fecha10Ids }: Props) {
   const [fechaSeleccionada, setFechaSeleccionada] = useState<number>(
     proximaId ?? fechas[0]?.id ?? 0
   )
@@ -151,7 +152,10 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
   const stCMFin    = esFinals ? getStandings(partidos, 'c_menos',      excludeForFinals) : []
 
   // ── Partidos de temporada regular (fechas 1-10) ───────────────────────
-  const partidosFecha10 = partidos.filter((p) => (p.fecha?.numero ?? 99) <= 10)
+  const f10Set = new Set(fecha10Ids ?? [])
+  const partidosFecha10 = f10Set.size > 0
+    ? partidos.filter((p) => f10Set.has(p.fecha_id))
+    : partidos.filter((p) => (p.fecha?.numero ?? 99) <= 10)
 
   // ── D Copa Plata unificada ───────────────────────────────────────────
   const stPlata1 = esFinals ? getStandings(partidosFecha10, 'd_copa_plata_1') : []
