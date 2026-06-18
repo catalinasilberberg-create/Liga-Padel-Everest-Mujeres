@@ -432,11 +432,18 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
                 </div>
               </div>
               <div>
+                <div className="px-3 py-1 bg-gray-500">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-white">3° / 4° Lugar</span>
+                </div>
+                <div className="px-3 py-1">
+                  <MatchRow label="3°/4°" a={p34a} b={p34b} hora="19:00" lugar="PLT" cancha="8" />
+                </div>
+              </div>
+              <div>
                 <div className="px-3 py-1 bg-gray-400">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-white">Demás Lugares</span>
                 </div>
                 <div className="px-3 py-1 divide-y divide-gray-50">
-                  <MatchRow label="3°/4°" a={p34a} b={p34b} hora="19:00" lugar="PLT" cancha="8" />
                   <MatchRow label="5°/6°" a={p56a} b={p56b} hora="19:00" lugar="PLT" cancha="9" />
                   <MatchRow label="7°/8°" a={p78a} b={p78b} hora="19:00" lugar="PLT" cancha="10" />
                 </div>
