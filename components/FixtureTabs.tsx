@@ -124,21 +124,11 @@ function MatchRow({ label, a, b, labelColor, hora, lugar, cancha, porDefinir }: 
 }
 
 const D_CATS = [
-  { key: 'd_copa_oro'     as const, label: 'D — Copa Oro',
+  { key: 'd_copa_oro' as const, label: 'D — Copa Oro',
     sf1:  { hora: '18:00', lugar: 'PLT',     cancha: '1' },
     sf2:  { hora: '18:00', lugar: 'PLT',     cancha: '2' },
     final:{ hora: '19:00', lugar: 'PLT',     cancha: '2' },
     p56:  { hora: '18:30', lugar: 'Everest', cancha: '1' } },
-  { key: 'd_copa_plata_1' as const, label: 'D — Copa Plata 1',
-    sf1:  { hora: '18:00', lugar: 'PLT',     cancha: '3' },
-    sf2:  { hora: '18:00', lugar: 'PLT',     cancha: '4' },
-    final:{ hora: '19:00', lugar: 'PLT',     cancha: '3' },
-    p56:  { hora: '18:30', lugar: 'Everest', cancha: '2' } },
-  { key: 'd_copa_plata_2' as const, label: 'D — Copa Plata 2',
-    sf1:  { hora: '18:00', lugar: 'PLT',     cancha: '5' },
-    sf2:  { hora: '18:00', lugar: 'PLT',     cancha: '6' },
-    final:{ hora: '19:00', lugar: 'PLT',     cancha: '4' },
-    p56:  { hora: '19:30', lugar: 'Everest', cancha: '1' } },
 ]
 
 export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaId, finalsFechaId }: Props) {
@@ -159,6 +149,14 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
   const excludeForFinals = [bracketFechaId, finalsFechaId].filter((x): x is number => x !== undefined)
   const stPrincFin = esFinals ? getStandings(partidos, 'principiante', excludeForFinals) : []
   const stCMFin    = esFinals ? getStandings(partidos, 'c_menos',      excludeForFinals) : []
+
+  // ── D Copa Plata unificada ───────────────────────────────────────────
+  const stPlata1 = esFinals ? getStandings(partidos, 'd_copa_plata_1', excludeForFinals) : []
+  const stPlata2 = esFinals ? getStandings(partidos, 'd_copa_plata_2', excludeForFinals) : []
+  const plataSF1r  = getMatchResult(partidos, stPlata1[0]?.id, stPlata2[1]?.id, finalsFechaId)
+  const plataSF2r  = getMatchResult(partidos, stPlata2[0]?.id, stPlata1[1]?.id, finalsFechaId)
+  const plataFinalA = plataSF1r?.winnerName || 'Gan. SF1'
+  const plataFinalB = plataSF2r?.winnerName || 'Gan. SF2'
 
   // ── C− SF/Final: depende de resultados de QF (bracketFechaId) ─────────
   const cmCF1r = getMatchResult(partidos, stCMFin[0]?.id, stCMFin[7]?.id, bracketFechaId)
@@ -500,6 +498,56 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
               </div>
             )
           })}
+
+          {/* D Copa Plata unificada */}
+          {(() => {
+            const color = getColorGrupo('d_copa_plata_1')
+            const sf1a = stPlata1[0]?.nombre || '1° Plata 1'
+            const sf1b = stPlata2[1]?.nombre || '2° Plata 2'
+            const sf2a = stPlata2[0]?.nombre || '1° Plata 2'
+            const sf2b = stPlata1[1]?.nombre || '2° Plata 1'
+            const rows = [3, 4, 5, 6].map((pos) => ({
+              label: `${pos}°`,
+              a: stPlata1[pos - 1]?.nombre || `${pos}° Plata 1`,
+              b: stPlata2[pos - 1]?.nombre || `${pos}° Plata 2`,
+            }))
+            return (
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="px-4 py-2.5 border-l-4" style={{ borderLeftColor: color.header, backgroundColor: color.bg }}>
+                  <span style={{ color: color.header }} className="text-xs font-bold uppercase tracking-wider">D — Copa Plata</span>
+                </div>
+                <div className="divide-y divide-gray-100">
+                  <div>
+                    <div className="px-3 py-1 bg-green-600">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-white">Semifinales</span>
+                    </div>
+                    <div className="px-3 py-1 divide-y divide-gray-50">
+                      <MatchRow label="SF1" a={sf1a} b={sf1b} labelColor={color.header} hora="18:00" lugar="PLT" cancha="3" />
+                      <MatchRow label="SF2" a={sf2a} b={sf2b} labelColor={color.header} hora="18:00" lugar="PLT" cancha="4" />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="px-3 py-1 bg-yellow-500">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-white">Final</span>
+                    </div>
+                    <div className="px-3 py-1">
+                      <MatchRow label="1°/2°" a={plataFinalA} b={plataFinalB} labelColor={color.header} hora="19:00" lugar="PLT" cancha="3" />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="px-3 py-1 bg-gray-400">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-white">Por Posición</span>
+                    </div>
+                    <div className="px-3 py-1 divide-y divide-gray-50">
+                      {rows.map((r) => (
+                        <MatchRow key={r.label} label={r.label} a={r.a} b={r.b} porDefinir />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )
+          })()}
 
           {/* C− */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
