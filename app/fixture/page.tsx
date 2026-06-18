@@ -33,7 +33,8 @@ export default async function FixturePage() {
 
   const proximaId = proxima?.id ?? fechasMostrar[0]?.id ?? null
 
-  const fecha10Ids = fechas.filter((f) => f.numero <= 10).map((f) => f.id)
+  const fecha10Ids  = fechas.filter((f) => f.numero <= 10).map((f) => f.id)
+  const fechaD10Ids = fechas.filter((f) => f.numero >= 6 && f.numero <= 10).map((f) => f.id)
 
   return (
     <div className="pb-4">
@@ -45,6 +46,7 @@ export default async function FixturePage() {
         bracketFechaId={BRACKET_FECHA_ID}
         finalsFechaId={FINALES_FECHA_ID}
         fecha10Ids={fecha10Ids}
+        fechaD10Ids={fechaD10Ids}
       />
     </div>
   )
