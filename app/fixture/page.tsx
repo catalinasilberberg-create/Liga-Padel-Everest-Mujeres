@@ -1,4 +1,5 @@
-import { getFechas, getPartidos, getProximaFecha } from '@/lib/data'
+import { getFechas, getPartidos, getParejas, getProximaFecha } from '@/lib/data'
+import { calcularPosiciones } from '@/lib/calculos'
 import FixtureTabs from '@/components/FixtureTabs'
 
 export const revalidate = 0
@@ -33,8 +34,15 @@ export default async function FixturePage() {
 
   const proximaId = proxima?.id ?? fechasMostrar[0]?.id ?? null
 
-  const fecha10Ids  = fechas.filter((f) => f.numero <= 10).map((f) => f.id)
-  const fechaD10Ids = fechas.filter((f) => f.numero >= 6 && f.numero <= 10).map((f) => f.id)
+  // Standings de D usando calcularPosiciones (igual que página de posiciones)
+  const [parejasOro, parejasP1, parejasP2] = await Promise.all([
+    getParejas('d_copa_oro'),
+    getParejas('d_copa_plata_1'),
+    getParejas('d_copa_plata_2'),
+  ])
+  const posOro    = calcularPosiciones(parejasOro, partidos.filter(p => p.pareja1?.grupo === 'd_copa_oro'     || p.pareja2?.grupo === 'd_copa_oro'),     6)
+  const posPlata1 = calcularPosiciones(parejasP1,  partidos.filter(p => p.pareja1?.grupo === 'd_copa_plata_1' || p.pareja2?.grupo === 'd_copa_plata_1'), 6)
+  const posPlata2 = calcularPosiciones(parejasP2,  partidos.filter(p => p.pareja1?.grupo === 'd_copa_plata_2' || p.pareja2?.grupo === 'd_copa_plata_2'), 6)
 
   return (
     <div className="pb-4">
@@ -45,8 +53,9 @@ export default async function FixturePage() {
         proximaId={proximaId}
         bracketFechaId={BRACKET_FECHA_ID}
         finalsFechaId={FINALES_FECHA_ID}
-        fecha10Ids={fecha10Ids}
-        fechaD10Ids={fechaD10Ids}
+        posOro={posOro}
+        posPlata1={posPlata1}
+        posPlata2={posPlata2}
       />
     </div>
   )
