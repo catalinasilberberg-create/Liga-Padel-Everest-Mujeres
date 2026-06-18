@@ -150,9 +150,13 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
   const stPrincFin = esFinals ? getStandings(partidos, 'principiante', excludeForFinals) : []
   const stCMFin    = esFinals ? getStandings(partidos, 'c_menos',      excludeForFinals) : []
 
+  // ── Partidos de temporada regular (fechas 1-10) ───────────────────────
+  const fecha10Ids = new Set(fechas.filter((f) => f.numero <= 10).map((f) => f.id))
+  const partidosFecha10 = partidos.filter((p) => fecha10Ids.has(p.fecha_id))
+
   // ── D Copa Plata unificada ───────────────────────────────────────────
-  const stPlata1 = esFinals ? getStandings(partidos, 'd_copa_plata_1', finalsFechaId) : []
-  const stPlata2 = esFinals ? getStandings(partidos, 'd_copa_plata_2', finalsFechaId) : []
+  const stPlata1 = esFinals ? getStandings(partidosFecha10, 'd_copa_plata_1') : []
+  const stPlata2 = esFinals ? getStandings(partidosFecha10, 'd_copa_plata_2') : []
   const plataSF1r  = getMatchResult(partidos, stPlata1[0]?.id, stPlata2[1]?.id, finalsFechaId)
   const plataSF2r  = getMatchResult(partidos, stPlata2[0]?.id, stPlata1[1]?.id, finalsFechaId)
   const plataFinalA = plataSF1r?.winnerName || 'Gan. SF1'
@@ -452,7 +456,7 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
           {/* D categories */}
           {D_CATS.map(({ key, label, sf1, sf2, final: fin, p56 }) => {
             const color = getColorGrupo(key)
-            const stD = getStandings(partidos, key, finalsFechaId)
+            const stD = getStandings(partidosFecha10, key)
             const dSF1r = getMatchResult(partidos, stD[0]?.id, stD[3]?.id, finalsFechaId)
             const dSF2r = getMatchResult(partidos, stD[1]?.id, stD[2]?.id, finalsFechaId)
             const dSF1a   = stD[0]?.nombre || '1° lugar'
