@@ -170,16 +170,39 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
   // ── Principiante SF results (de bracketFechaId) → Finales ────────────
   const pSF1 = getMatchResult(partidos, stPrincFin[0]?.id, stPrincFin[3]?.id, bracketFechaId)
   const pSF2 = getMatchResult(partidos, stPrincFin[1]?.id, stPrincFin[2]?.id, bracketFechaId)
-  const p58  = getMatchResult(partidos, stPrincFin[4]?.id, stPrincFin[7]?.id, bracketFechaId)
-  const p68  = getMatchResult(partidos, stPrincFin[5]?.id, stPrincFin[6]?.id, bracketFechaId)
+
+  // P3/P4: partidos del bracket que NO son SF (evita desfase de posiciones)
+  const sfTeamIds = new Set([
+    ...(pSF1 ? [pSF1.winnerId, pSF1.loserId] : []),
+    ...(pSF2 ? [pSF2.winnerId, pSF2.loserId] : []),
+  ])
+  const pNonSF = (esFinals && bracketFechaId) ? partidos.filter((p) =>
+    p.fecha_id === bracketFechaId &&
+    (p.pareja1?.grupo === 'principiante' || p.pareja2?.grupo === 'principiante') &&
+    !( sfTeamIds.has(p.pareja1_id) && sfTeamIds.has(p.pareja2_id) )
+  ) : []
+  const mkResult = (p: Partido | undefined): MatchResult | null => {
+    if (!p?.jugado || p.set1_p1 === null) return null
+    const pts = calcularPuntos(p)
+    const p1w = pts.p1 > pts.p2
+    return {
+      winnerId:   p1w ? p.pareja1_id : p.pareja2_id,
+      loserId:    p1w ? p.pareja2_id : p.pareja1_id,
+      winnerName: (p1w ? p.pareja1?.nombre : p.pareja2?.nombre) ?? '',
+      loserName:  (p1w ? p.pareja2?.nombre : p.pareja1?.nombre) ?? '',
+    }
+  }
+  const p3r = mkResult(pNonSF[0])
+  const p4r = mkResult(pNonSF[1])
+
   const pFinalA = pSF1?.winnerName ?? 'Gan. SF1'
   const pFinalB = pSF2?.winnerName ?? 'Gan. SF2'
   const p34a    = pSF1?.loserName  ?? 'Perd. SF1'
   const p34b    = pSF2?.loserName  ?? 'Perd. SF2'
-  const p56a    = p58?.winnerName  ?? 'Gan. P3'
-  const p56b    = p68?.winnerName  ?? 'Gan. P4'
-  const p78a    = p58?.loserName   ?? 'Perd. P3'
-  const p78b    = p68?.loserName   ?? 'Perd. P4'
+  const p56a    = p3r?.winnerName  ?? 'Gan. P3'
+  const p56b    = p4r?.winnerName  ?? 'Gan. P4'
+  const p78a    = p3r?.loserName   ?? 'Perd. P3'
+  const p78b    = p4r?.loserName   ?? 'Perd. P4'
 
 
   return (
