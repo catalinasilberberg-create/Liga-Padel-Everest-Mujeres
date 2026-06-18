@@ -157,15 +157,26 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
 
   // ── Standings para finales (excluye bracket + finales fechas) ────────
   const excludeForFinals = [bracketFechaId, finalsFechaId].filter((x): x is number => x !== undefined)
-  const stPrincFin = esFinals ? getStandings(partidos, 'principiante',   excludeForFinals) : []
+  const stPrincFin = esFinals ? getStandings(partidos, 'principiante', excludeForFinals) : []
+  const stCMFin    = esFinals ? getStandings(partidos, 'c_menos',      excludeForFinals) : []
 
-  // ── C− todo estático: los cruces dependen de QF (hoy) y no se pueden computar
-  // dinámicamente sin riesgo de desfase de posiciones. El 07.07 se ven los resultados reales.
-  const cmSF1a = 'Gan. CF1', cmSF1b = 'Gan. CF4'
-  const cmSF2a = 'Gan. CF2', cmSF2b = 'Gan. CF3'
-  const cm5a   = 'Perd. CF1', cm5b  = 'Perd. CF4'
-  const cm7a   = 'Perd. CF2', cm7b  = 'Perd. CF3'
-  const cmFinalA = 'Gan. SF1', cmFinalB = 'Gan. SF2'
+  // ── C− SF/Final: depende de resultados de QF (bracketFechaId) ─────────
+  const cmCF1r = getMatchResult(partidos, stCMFin[0]?.id, stCMFin[7]?.id, bracketFechaId)
+  const cmCF2r = getMatchResult(partidos, stCMFin[1]?.id, stCMFin[6]?.id, bracketFechaId)
+  const cmCF3r = getMatchResult(partidos, stCMFin[2]?.id, stCMFin[5]?.id, bracketFechaId)
+  const cmCF4r = getMatchResult(partidos, stCMFin[3]?.id, stCMFin[4]?.id, bracketFechaId)
+  const cmSF1a   = cmCF1r?.winnerName || 'Gan. CF1'
+  const cmSF1b   = cmCF4r?.winnerName || 'Gan. CF4'
+  const cmSF2a   = cmCF2r?.winnerName || 'Gan. CF2'
+  const cmSF2b   = cmCF3r?.winnerName || 'Gan. CF3'
+  const cm5a     = cmCF1r?.loserName  || 'Perd. CF1'
+  const cm5b     = cmCF4r?.loserName  || 'Perd. CF4'
+  const cm7a     = cmCF2r?.loserName  || 'Perd. CF2'
+  const cm7b     = cmCF3r?.loserName  || 'Perd. CF3'
+  const cmSF1r   = getMatchResult(partidos, cmCF1r?.winnerId, cmCF4r?.winnerId, finalsFechaId)
+  const cmSF2r   = getMatchResult(partidos, cmCF2r?.winnerId, cmCF3r?.winnerId, finalsFechaId)
+  const cmFinalA = cmSF1r?.winnerName || 'Gan. SF1'
+  const cmFinalB = cmSF2r?.winnerName || 'Gan. SF2'
 
   // ── Principiante SF results (de bracketFechaId) → Finales ────────────
   const pSF1 = getMatchResult(partidos, stPrincFin[0]?.id, stPrincFin[3]?.id, bracketFechaId)
@@ -431,6 +442,17 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
           {/* D categories */}
           {D_CATS.map(({ key, label, sf1, sf2, final: fin, p56 }) => {
             const color = getColorGrupo(key)
+            const stD = getStandings(partidos, key, excludeForFinals)
+            const dSF1r = getMatchResult(partidos, stD[0]?.id, stD[3]?.id, finalsFechaId)
+            const dSF2r = getMatchResult(partidos, stD[1]?.id, stD[2]?.id, finalsFechaId)
+            const dSF1a   = stD[0]?.nombre || '1° lugar'
+            const dSF1b   = stD[3]?.nombre || '4° lugar'
+            const dSF2a   = stD[1]?.nombre || '2° lugar'
+            const dSF2b   = stD[2]?.nombre || '3° lugar'
+            const d56a    = stD[4]?.nombre || '5° lugar'
+            const d56b    = stD[5]?.nombre || '6° lugar'
+            const dFinalA = dSF1r?.winnerName || 'Gan. SF1'
+            const dFinalB = dSF2r?.winnerName || 'Gan. SF2'
             return (
               <div key={key} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                 <div className="px-4 py-2.5 border-l-4" style={{ borderLeftColor: color.header, backgroundColor: color.bg }}>
@@ -442,8 +464,8 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
                       <span className="text-[10px] font-bold uppercase tracking-wider text-white">Semifinales</span>
                     </div>
                     <div className="px-3 py-1 divide-y divide-gray-50">
-                      <MatchRow label="SF1" a="1° lugar" b="4° lugar" labelColor={color.header} hora={sf1.hora} lugar={sf1.lugar} cancha={sf1.cancha} />
-                      <MatchRow label="SF2" a="2° lugar" b="3° lugar" labelColor={color.header} hora={sf2.hora} lugar={sf2.lugar} cancha={sf2.cancha} />
+                      <MatchRow label="SF1" a={dSF1a} b={dSF1b} labelColor={color.header} hora={sf1.hora} lugar={sf1.lugar} cancha={sf1.cancha} />
+                      <MatchRow label="SF2" a={dSF2a} b={dSF2b} labelColor={color.header} hora={sf2.hora} lugar={sf2.lugar} cancha={sf2.cancha} />
                     </div>
                   </div>
                   <div>
@@ -451,7 +473,7 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
                       <span className="text-[10px] font-bold uppercase tracking-wider text-white">Final</span>
                     </div>
                     <div className="px-3 py-1">
-                      <MatchRow label="1°/2°" a="Gan. SF1" b="Gan. SF2" labelColor={color.header} hora={fin.hora} lugar={fin.lugar} cancha={fin.cancha} />
+                      <MatchRow label="1°/2°" a={dFinalA} b={dFinalB} labelColor={color.header} hora={fin.hora} lugar={fin.lugar} cancha={fin.cancha} />
                     </div>
                   </div>
                   <div>
@@ -459,7 +481,7 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
                       <span className="text-[10px] font-bold uppercase tracking-wider text-white">5° / 6° Lugar</span>
                     </div>
                     <div className="px-3 py-1">
-                      <MatchRow label="5°/6°" a="5° lugar" b="6° lugar" hora={p56.hora} lugar={p56.lugar} cancha={p56.cancha} />
+                      <MatchRow label="5°/6°" a={d56a} b={d56b} hora={p56.hora} lugar={p56.lugar} cancha={p56.cancha} />
                     </div>
                   </div>
                 </div>
