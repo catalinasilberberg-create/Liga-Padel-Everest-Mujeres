@@ -171,14 +171,15 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
   const pSF1 = getMatchResult(partidos, stPrincFin[0]?.id, stPrincFin[3]?.id, bracketFechaId)
   const pSF2 = getMatchResult(partidos, stPrincFin[1]?.id, stPrincFin[2]?.id, bracketFechaId)
 
-  // P3/P4: partidos del bracket que NO son SF (evita desfase de posiciones)
+  // P3/P4: partidos del bracket que NO son SF
+  // stPrincFin da los IDs del top-8 de principiante (seedings originales)
   const sfTeamIds = new Set([
-    ...(pSF1 ? [pSF1.winnerId, pSF1.loserId] : []),
-    ...(pSF2 ? [pSF2.winnerId, pSF2.loserId] : []),
-  ])
+    stPrincFin[0]?.id, stPrincFin[1]?.id, stPrincFin[2]?.id, stPrincFin[3]?.id,
+  ].filter((x): x is number => x !== undefined))
+  const allPrincIds = new Set(stPrincFin.map((s) => s.id))
   const pNonSF = (esFinals && bracketFechaId) ? partidos.filter((p) =>
     p.fecha_id === bracketFechaId &&
-    (p.pareja1?.grupo === 'principiante' || p.pareja2?.grupo === 'principiante') &&
+    (allPrincIds.has(p.pareja1_id) || allPrincIds.has(p.pareja2_id)) &&
     !( sfTeamIds.has(p.pareja1_id) && sfTeamIds.has(p.pareja2_id) )
   ) : []
   const mkResult = (p: Partido | undefined): MatchResult | null => {
@@ -195,14 +196,14 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
   const p3r = mkResult(pNonSF[0])
   const p4r = mkResult(pNonSF[1])
 
-  const pFinalA = pSF1?.winnerName ?? 'Gan. SF1'
-  const pFinalB = pSF2?.winnerName ?? 'Gan. SF2'
-  const p34a    = pSF1?.loserName  ?? 'Perd. SF1'
-  const p34b    = pSF2?.loserName  ?? 'Perd. SF2'
-  const p56a    = p3r?.winnerName  ?? 'Gan. P3'
-  const p56b    = p4r?.winnerName  ?? 'Gan. P4'
-  const p78a    = p3r?.loserName   ?? 'Perd. P3'
-  const p78b    = p4r?.loserName   ?? 'Perd. P4'
+  const pFinalA = pSF1?.winnerName || 'Gan. SF1'
+  const pFinalB = pSF2?.winnerName || 'Gan. SF2'
+  const p34a    = pSF1?.loserName  || 'Perd. SF1'
+  const p34b    = pSF2?.loserName  || 'Perd. SF2'
+  const p56a    = p3r?.winnerName  || 'Gan. P3'
+  const p56b    = p4r?.winnerName  || 'Gan. P4'
+  const p78a    = p3r?.loserName   || 'Perd. P3'
+  const p78b    = p4r?.loserName   || 'Perd. P4'
 
 
   return (
