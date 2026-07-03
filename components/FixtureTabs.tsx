@@ -595,7 +595,7 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
                 <div className="px-3 py-1 divide-y divide-gray-50">
                   <MatchRow label="5°/6°"    a={cm5a} b={cm5b} hora="18:30" lugar="Everest" cancha="2" />
                   <MatchRow label="7°/8°"   a={cm7a} b={cm7b} porDefinir />
-                  <MatchRow label="9°/10°"  a="9° C−" b="10° C−" hora="19:30" lugar="Everest" cancha="2" />
+                  <MatchRow label="9°/10°"  a="Pérez - Fuenzalida" b="Mendía - Bier" hora="19:30" lugar="Everest" cancha="2" />
                 </div>
               </div>
             </div>
