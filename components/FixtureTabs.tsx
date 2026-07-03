@@ -544,8 +544,19 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
                       <span className="text-[10px] font-bold uppercase tracking-wider text-white">Por Posición</span>
                     </div>
                     <div className="px-3 py-1 divide-y divide-gray-50">
-                      {rows.map((r) => (
-                        <MatchRow key={r.label} label={r.label} a={r.a} b={r.b} porDefinir />
+                      {[
+                        { pos: 3, hora: '19:00', lugar: 'PLT',       cancha: '4' },
+                        { pos: 4, hora: '18:00', lugar: 'PLT',       cancha: '5' },
+                        { pos: 5, hora: '18:00', lugar: 'PLT',       cancha: '6' },
+                        { pos: 6, hora: '18:00', lugar: 'Santuario', cancha: '5' },
+                      ].map(({ pos, hora, lugar, cancha }) => (
+                        <MatchRow
+                          key={pos}
+                          label={`${pos}°`}
+                          a={stPlata1[pos - 1]?.nombre || `${pos}° Plata 1`}
+                          b={stPlata2[pos - 1]?.nombre || `${pos}° Plata 2`}
+                          hora={hora} lugar={lugar} cancha={cancha}
+                        />
                       ))}
                     </div>
                   </div>
@@ -582,9 +593,9 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
                   <span className="text-[10px] font-bold uppercase tracking-wider text-white">Demás Lugares</span>
                 </div>
                 <div className="px-3 py-1 divide-y divide-gray-50">
-                  <MatchRow label="5°/6°"    a={cm5a} b={cm5b} porDefinir />
-                  <MatchRow label="7°/8°"   a={cm7a} b={cm7b} hora="19:30" lugar="Everest" cancha="2" />
-                  <MatchRow label="Amistoso" a="9° C−" b="10° C−" porDefinir />
+                  <MatchRow label="5°/6°"    a={cm5a} b={cm5b} hora="18:30" lugar="Everest" cancha="2" />
+                  <MatchRow label="7°/8°"   a={cm7a} b={cm7b} porDefinir />
+                  <MatchRow label="9°/10°"  a="9° C−" b="10° C−" hora="19:30" lugar="Everest" cancha="2" />
                 </div>
               </div>
             </div>
