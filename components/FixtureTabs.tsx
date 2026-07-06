@@ -101,14 +101,16 @@ function getMatchResult(
   }
 }
 
-function MatchRow({ label, a, b, labelColor, hora, lugar, cancha, porDefinir }: {
+function MatchRow({ label, a, b, labelColor, hora, lugar, cancha, porDefinir, suspendido }: {
   label: string; a: string; b: string; labelColor?: string
-  hora?: string; lugar?: string; cancha?: string; porDefinir?: boolean
+  hora?: string; lugar?: string; cancha?: string; porDefinir?: boolean; suspendido?: boolean
 }) {
   return (
     <div className="flex items-center gap-2 py-1.5">
       <div className="shrink-0 w-16 text-center">
-        {hora ? (
+        {suspendido ? (
+          <div className="text-[10px] font-bold text-red-500 uppercase">Susp.</div>
+        ) : hora ? (
           <>
             <div className="text-xs font-bold" style={{ color: labelColor ?? '#6b7280' }}>{hora}</div>
             <div className="text-[10px] text-gray-400">{lugar} C{cancha}</div>
@@ -496,7 +498,7 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
                       <span className="text-[10px] font-bold uppercase tracking-wider text-white">5° / 6° Lugar</span>
                     </div>
                     <div className="px-3 py-1">
-                      <MatchRow label="5°/6°" a={d56a} b={d56b} hora={p56.hora} lugar={p56.lugar} cancha={p56.cancha} />
+                      <MatchRow label="5°/6°" a={d56a} b={d56b} hora={p56.hora} lugar={p56.lugar} cancha={p56.cancha} suspendido={key === 'd_copa_oro'} />
                     </div>
                   </div>
                 </div>
