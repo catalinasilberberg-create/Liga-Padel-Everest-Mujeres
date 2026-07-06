@@ -548,7 +548,7 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
                         { pos: 3, label: '5°/6°',   hora: '19:00', lugar: 'PLT',       cancha: '4' },
                         { pos: 4, label: '7°/8°',   hora: '18:00', lugar: 'PLT',       cancha: '5' },
                         { pos: 5, label: '9°/10°',  hora: '18:00', lugar: 'PLT',       cancha: '6' },
-                        { pos: 6, label: '11°/12°', hora: '18:00', lugar: 'Santuario', cancha: '5' },
+                        { pos: 6, label: '11°/12°', hora: '18:30', lugar: 'Everest', cancha: '1' },
                       ].map(({ pos, label, hora, lugar, cancha }) => (
                         <MatchRow
                           key={pos}
