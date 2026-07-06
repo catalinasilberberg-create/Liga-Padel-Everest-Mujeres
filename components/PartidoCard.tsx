@@ -23,7 +23,13 @@ export default function PartidoCard({ partido, grupo }: Props) {
       }`}
     >
       {/* Hora y lugar */}
-      {(partido.hora || partido.lugar || partido.cancha) && (
+      {partido.lugar === 'Suspendido' ? (
+        <div className="flex items-center gap-1.5 mb-1.5">
+          <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-red-100 text-red-600 uppercase tracking-wide">
+            Suspendido
+          </span>
+        </div>
+      ) : (partido.hora || partido.lugar || partido.cancha) ? (
         <div className="flex items-center gap-1.5 mb-1.5">
           {partido.hora && (
             <span
@@ -39,7 +45,7 @@ export default function PartidoCard({ partido, grupo }: Props) {
             </span>
           )}
         </div>
-      )}
+      ) : null}
 
       {/* Pareja 1 */}
       <div className="flex justify-between items-center">
