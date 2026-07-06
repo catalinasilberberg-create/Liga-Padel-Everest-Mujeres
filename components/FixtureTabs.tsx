@@ -541,18 +541,18 @@ export default function FixtureTabs({ fechas, partidos, proximaId, bracketFechaI
                   </div>
                   <div>
                     <div className="px-3 py-1 bg-gray-400">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-white">Por Posición</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-white">Demás Lugares</span>
                     </div>
                     <div className="px-3 py-1 divide-y divide-gray-50">
                       {[
-                        { pos: 3, hora: '19:00', lugar: 'PLT',       cancha: '4' },
-                        { pos: 4, hora: '18:00', lugar: 'PLT',       cancha: '5' },
-                        { pos: 5, hora: '18:00', lugar: 'PLT',       cancha: '6' },
-                        { pos: 6, hora: '18:00', lugar: 'Santuario', cancha: '5' },
-                      ].map(({ pos, hora, lugar, cancha }) => (
+                        { pos: 3, label: '5°/6°',   hora: '19:00', lugar: 'PLT',       cancha: '4' },
+                        { pos: 4, label: '7°/8°',   hora: '18:00', lugar: 'PLT',       cancha: '5' },
+                        { pos: 5, label: '9°/10°',  hora: '18:00', lugar: 'PLT',       cancha: '6' },
+                        { pos: 6, label: '11°/12°', hora: '18:00', lugar: 'Santuario', cancha: '5' },
+                      ].map(({ pos, label, hora, lugar, cancha }) => (
                         <MatchRow
                           key={pos}
-                          label={`${pos}°`}
+                          label={label}
                           a={stPlata1[pos - 1]?.nombre || `${pos}° Plata 1`}
                           b={stPlata2[pos - 1]?.nombre || `${pos}° Plata 2`}
                           hora={hora} lugar={lugar} cancha={cancha}
